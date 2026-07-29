@@ -5,6 +5,7 @@ import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import routes from "./routes.js";
+import errorHandler from "./middlewares/error.middleware.js";
 
 const app = express();
 
@@ -39,4 +40,6 @@ app.use(cookieParser());
 
 app.use("/api/v1", routes);
 
+// Error Handling Middleware
+app.use(errorHandler);
 export default app;
