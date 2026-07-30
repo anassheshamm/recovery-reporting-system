@@ -34,7 +34,9 @@ class UserService {
 
   async findByNationalId(nationalId) {}
 
-  async findById(id) {}
+  async findById(id) {
+    return await User.findById(id);
+  }
 
   async getAll(filters = {}) {}
 
