@@ -1,5 +1,6 @@
 import { body } from "express-validator";
 
+
 export const loginValidation = [
   body("email")
     .notEmpty()
@@ -11,4 +12,41 @@ export const loginValidation = [
   body("password")
     .notEmpty()
     .withMessage("Password is required"),
+];
+
+export const registerValidation = [
+  body("token")
+    .notEmpty()
+    .withMessage("Invitation token is required."),
+
+  body("firstName")
+    .trim()
+    .notEmpty()
+    .withMessage("First name is required."),
+
+  body("middleName")
+    .trim()
+    .notEmpty()
+    .withMessage("Middle name is required."),
+
+  body("lastName")
+    .trim()
+    .notEmpty()
+    .withMessage("Last name is required."),
+
+  body("nationalId")
+    .isLength({ min: 14, max: 14 })
+    .withMessage("National ID must be 14 digits."),
+
+  body("phone")
+    .notEmpty()
+    .withMessage("Phone is required."),
+
+  body("gender")
+    .isIn(["male", "female"])
+    .withMessage("Invalid gender."),
+
+  body("password")
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters."),
 ];
