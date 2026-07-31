@@ -76,6 +76,11 @@ const userSchema = new mongoose.Schema(
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     },
+    teamLeader: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  default: null,
+},
   },
   {
     timestamps: true,
