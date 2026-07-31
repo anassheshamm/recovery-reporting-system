@@ -1,0 +1,22 @@
+import { Router } from "express";
+
+import invitationController from "./invitation.controller.js";
+
+import protect from "../../middlewares/protect.middleware.js";
+import authorize from "../../middlewares/authorize.middleware.js";
+import validate from "../../middlewares/validate.middleware.js";
+
+import { createInvitationValidation } from "./invitation.validation.js";
+
+const router = Router();
+
+router.post(
+  "/",
+  protect,
+  authorize("admin"),
+  createInvitationValidation,
+  validate,
+  invitationController.create
+);
+
+export default router;
