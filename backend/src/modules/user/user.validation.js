@@ -34,6 +34,6 @@ export const createUserValidation = [
     .withMessage("Password must be at least 8 characters"),
 
   body("role")
-    .isIn(["admin", "doctor", "team_leader"])
+    .isIn(["admin", "doctor", "teamLeader"])
     .withMessage("Invalid role"),
 ];

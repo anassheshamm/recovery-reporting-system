@@ -3,6 +3,7 @@ import userRoutes from "./modules/user/user.routes.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import patientRoutes from "./modules/patient/patient.routes.js";
 import invitationRoutes from "./modules/invitation/invitation.routes.js";
+import preReportRoutes from "./modules/preReport/preReport.routes.js";
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use("/users", userRoutes);
 router.use("/auth", authRoutes);
 router.use("/patients", patientRoutes);
 router.use("/invitations", invitationRoutes);
+router.use("/pre-reports", preReportRoutes);
 
 export default router;
