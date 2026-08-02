@@ -14,18 +14,20 @@ const BeneficiaryReportPage = () => {
   const [patient, setPatient] = useState(null);
 
   const [formData, setFormData] = useState({
+    teamLeader: "",
+
     reportInformation: {
       programName: "",
-      reportDate: new Date().toISOString().split("T")[0],
-      reportType: "pre",
+      startDate: new Date().toISOString().split("T")[0],
     },
 
-    generalInformation: {
+    generalCaseInformation: {
       addictionSeverity: "",
       previousSubstanceType: "",
-      usageDuration: "",
-      previousAttemptsCount: 0,
-      motives: {
+      addictionDuration: "",
+      previousRecoveryAttempts: 0,
+
+      motivations: {
         personal: false,
         family: false,
         legal: false,
@@ -33,19 +35,14 @@ const BeneficiaryReportPage = () => {
       },
     },
 
-    initialAssessment: {
-      psychological: "",
-      behavior: "",
-      commitment: "",
+    initialEvaluations: {
+      psychologicalStatus: "",
+      behavioralStatus: "",
+      programCommitment: "",
     },
 
-    recommendations: "",
-
-    signatures: {
-      mentorSignature: "",
-      mentorDate: "",
-      teamLeaderSignature: "",
-      teamLeaderDate: "",
+    initialRecommendations: {
+      recommendations: "",
     },
   });
 
@@ -57,10 +54,9 @@ const BeneficiaryReportPage = () => {
     try {
       setLoading(true);
 
-      const response =
-        await patientService.getPatient(patientId);
+      const response = await patientService.getPatient(patientId);
 
-      setPatient(response.data);
+      setPatient(response.data?.data?.patient || response.data);
     } catch (error) {
       console.error(error);
       alert("Failed to load patient.");
@@ -97,14 +93,14 @@ const BeneficiaryReportPage = () => {
     setFormData((prev) => ({
       ...prev,
 
-      generalInformation: {
-        ...prev.generalInformation,
+      generalCaseInformation: {
+        ...prev.generalCaseInformation,
 
-        motives: {
-          ...prev.generalInformation.motives,
+        motivations: {
+          ...prev.generalCaseInformation.motivations,
 
           [key]:
-            !prev.generalInformation.motives[key],
+            !prev.generalCaseInformation.motivations[key],
         },
       },
     }));
@@ -113,20 +109,82 @@ const BeneficiaryReportPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const motivations = Object.entries(
+      formData.generalCaseInformation.motivations
+    )
+      .filter(([, checked]) => checked)
+      .map(([key]) => key);
+
+    const payload = {
+      patient: patientId,
+
+      teamLeader: formData.teamLeader,
+
+      reportInformation: {
+        programName:
+          formData.reportInformation.programName,
+
+        startDate:
+          formData.reportInformation.startDate,
+      },
+
+      generalCaseInformation: {
+        addictionSeverity:
+          formData.generalCaseInformation
+            .addictionSeverity,
+
+        previousSubstanceType:
+          formData.generalCaseInformation
+            .previousSubstanceType,
+
+        addictionDuration:
+          formData.generalCaseInformation
+            .addictionDuration,
+
+        previousRecoveryAttempts: Number(
+          formData.generalCaseInformation
+            .previousRecoveryAttempts
+        ),
+
+        motivations,
+      },
+
+      initialEvaluations: {
+        psychologicalStatus:
+          formData.initialEvaluations
+            .psychologicalStatus,
+
+        behavioralStatus:
+          formData.initialEvaluations
+            .behavioralStatus,
+
+        programCommitment:
+          formData.initialEvaluations
+            .programCommitment,
+      },
+
+      initialRecommendations: {
+        recommendations:
+          formData.initialRecommendations
+            .recommendations,
+      },
+    };
+
     try {
       setSaving(true);
 
-      await reportService.createPreReport(
-        patientId,
-        formData
-      );
+      await reportService.createPreReport(payload);
 
       alert("Report created successfully.");
 
       navigate(`/doctor/patients/${patientId}`);
     } catch (error) {
       console.error(error);
-      alert("Failed to create report.");
+
+      alert(
+        error?.response?.data?.message ||
+        "Failed to create report."
+      );
     } finally {
       setSaving(false);
     }
@@ -154,7 +212,7 @@ const BeneficiaryReportPage = () => {
           <div className="mb-8 flex flex-wrap items-center justify-center gap-12">
 
             <img
-              src="/logo1.png"
+              src="/logo.png"
               alt="Logo"
               className="h-16 object-contain"
             />
@@ -165,11 +223,11 @@ const BeneficiaryReportPage = () => {
               className="h-16 object-contain"
             />
 
-            <img
+            {/* <img
               src="/logo3.png"
               alt="Logo"
               className="h-16 object-contain"
-            />
+            /> */}
 
           </div>
 
@@ -201,7 +259,8 @@ const BeneficiaryReportPage = () => {
           onSubmit={handleSubmit}
           className="mt-10"
         >
-                    {/* ================= BASIC INFORMATION ================= */}
+
+          {/* ================= BASIC INFORMATION ================= */}
 
           <section className="mt-12">
 
@@ -221,7 +280,7 @@ const BeneficiaryReportPage = () => {
                     type="text"
                     value={
                       patient
-                        ? `${patient.firstName} ${patient.middleName} ${patient.lastName}`
+                        ? `${patient.firstName || ""} ${patient.middleName || ""} ${patient.lastName || ""}`
                         : ""
                     }
                     readOnly
@@ -249,18 +308,18 @@ const BeneficiaryReportPage = () => {
 
                 </div>
 
-                {/* Report Date */}
+                {/* Program Start Date */}
 
                 <div className="flex flex-col gap-3">
 
                   <label className="font-semibold text-[#1E7A5A]">
-                    تاريخ التقرير
+                    تاريخ بداية البرنامج
                   </label>
 
                   <input
                     type="date"
-                    name="reportInformation.reportDate"
-                    value={formData.reportInformation.reportDate}
+                    name="reportInformation.startDate"
+                    value={formData.reportInformation.startDate}
                     onChange={handleInputChange}
                     className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
                   />
@@ -280,6 +339,25 @@ const BeneficiaryReportPage = () => {
                     value={patient?.nationalId || ""}
                     readOnly
                     className="w-full rounded-xl border border-[#E7F0EB] bg-gray-100 px-5 py-4"
+                  />
+
+                </div>
+
+                {/* Temporary Team Leader */}
+
+                <div className="flex flex-col gap-3 md:col-span-2">
+
+                  <label className="font-semibold text-[#1E7A5A]">
+                    Team Leader ID
+                  </label>
+
+                  <input
+                    type="text"
+                    name="teamLeader"
+                    value={formData.teamLeader}
+                    onChange={handleInputChange}
+                    placeholder="Temporary until Team Leader dropdown is implemented"
+                    className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
                   />
 
                 </div>
@@ -310,6 +388,8 @@ const BeneficiaryReportPage = () => {
 
               <div className="grid grid-cols-1 gap-7 md:grid-cols-2">
 
+                {/* Addiction Severity */}
+
                 <div className="flex flex-col gap-3">
 
                   <label className="font-semibold text-[#1E7A5A]">
@@ -318,13 +398,15 @@ const BeneficiaryReportPage = () => {
 
                   <input
                     type="text"
-                    name="generalInformation.addictionSeverity"
-                    value={formData.generalInformation.addictionSeverity}
+                    name="generalCaseInformation.addictionSeverity"
+                    value={formData.generalCaseInformation.addictionSeverity}
                     onChange={handleInputChange}
                     className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
                   />
 
                 </div>
+
+                {/* Previous Substance */}
 
                 <div className="flex flex-col gap-3">
 
@@ -334,13 +416,15 @@ const BeneficiaryReportPage = () => {
 
                   <input
                     type="text"
-                    name="generalInformation.previousSubstanceType"
-                    value={formData.generalInformation.previousSubstanceType}
+                    name="generalCaseInformation.previousSubstanceType"
+                    value={formData.generalCaseInformation.previousSubstanceType}
                     onChange={handleInputChange}
                     className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
                   />
 
                 </div>
+
+                {/* Addiction Duration */}
 
                 <div className="flex flex-col gap-3">
 
@@ -350,13 +434,15 @@ const BeneficiaryReportPage = () => {
 
                   <input
                     type="text"
-                    name="generalInformation.usageDuration"
-                    value={formData.generalInformation.usageDuration}
+                    name="generalCaseInformation.addictionDuration"
+                    value={formData.generalCaseInformation.addictionDuration}
                     onChange={handleInputChange}
                     className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
                   />
 
                 </div>
+
+                {/* Previous Recovery Attempts */}
 
                 <div className="flex flex-col gap-3">
 
@@ -367,8 +453,11 @@ const BeneficiaryReportPage = () => {
                   <input
                     type="number"
                     min={0}
-                    name="generalInformation.previousAttemptsCount"
-                    value={formData.generalInformation.previousAttemptsCount}
+                    name="generalCaseInformation.previousRecoveryAttempts"
+                    value={
+                      formData.generalCaseInformation
+                        .previousRecoveryAttempts
+                    }
                     onChange={handleInputChange}
                     className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
                   />
@@ -376,6 +465,8 @@ const BeneficiaryReportPage = () => {
                 </div>
 
               </div>
+
+              {/* Motivations */}
 
               <div className="mt-8">
 
@@ -400,7 +491,8 @@ const BeneficiaryReportPage = () => {
                       <input
                         type="checkbox"
                         checked={
-                          formData.generalInformation.motives[item.key]
+                          formData.generalCaseInformation
+                            .motivations[item.key]
                         }
                         onChange={() =>
                           handleCheckboxChange(item.key)
@@ -421,7 +513,8 @@ const BeneficiaryReportPage = () => {
             </div>
 
           </section>
-                    {/* ================= INITIAL ASSESSMENT ================= */}
+
+          {/* ================= INITIAL EVALUATIONS ================= */}
 
           <section className="mt-12">
 
@@ -453,11 +546,11 @@ const BeneficiaryReportPage = () => {
                     label: "مستقر",
                   },
                   {
-                    value: "mild",
+                    value: "mild_disorder",
                     label: "يعاني من اضطراب طفيف",
                   },
                   {
-                    value: "severe",
+                    value: "severe_disorder",
                     label: "يعاني من اضطراب شديد",
                   },
                 ].map((option) => (
@@ -469,18 +562,18 @@ const BeneficiaryReportPage = () => {
 
                     <input
                       type="radio"
-                      name="initialAssessment.psychological"
+                      name="initialEvaluations.psychologicalStatus"
                       value={option.value}
                       checked={
-                        formData.initialAssessment.psychological ===
+                        formData.initialEvaluations.psychologicalStatus ===
                         option.value
                       }
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
-                          initialAssessment: {
-                            ...prev.initialAssessment,
-                            psychological: e.target.value,
+                          initialEvaluations: {
+                            ...prev.initialEvaluations,
+                            psychologicalStatus: e.target.value,
                           },
                         }))
                       }
@@ -525,18 +618,18 @@ const BeneficiaryReportPage = () => {
 
                     <input
                       type="radio"
-                      name="initialAssessment.behavior"
+                      name="initialEvaluations.behavioralStatus"
                       value={option.value}
                       checked={
-                        formData.initialAssessment.behavior ===
+                        formData.initialEvaluations.behavioralStatus ===
                         option.value
                       }
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
-                          initialAssessment: {
-                            ...prev.initialAssessment,
-                            behavior: e.target.value,
+                          initialEvaluations: {
+                            ...prev.initialEvaluations,
+                            behavioralStatus: e.target.value,
                           },
                         }))
                       }
@@ -551,7 +644,7 @@ const BeneficiaryReportPage = () => {
 
               </div>
 
-              {/* Commitment */}
+              {/* Program Commitment */}
 
               <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-7 shadow-[0_10px_30px_rgba(30,122,90,0.08)]">
 
@@ -581,18 +674,18 @@ const BeneficiaryReportPage = () => {
 
                     <input
                       type="radio"
-                      name="initialAssessment.commitment"
+                      name="initialEvaluations.programCommitment"
                       value={option.value}
                       checked={
-                        formData.initialAssessment.commitment ===
+                        formData.initialEvaluations.programCommitment ===
                         option.value
                       }
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
-                          initialAssessment: {
-                            ...prev.initialAssessment,
-                            commitment: e.target.value,
+                          initialEvaluations: {
+                            ...prev.initialEvaluations,
+                            programCommitment: e.target.value,
                           },
                         }))
                       }
@@ -631,22 +724,33 @@ const BeneficiaryReportPage = () => {
 
               <textarea
                 rows={8}
-                name="recommendations"
-                value={formData.recommendations}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    recommendations: e.target.value,
-                  }))
+                name="initialRecommendations.recommendations"
+                value={
+                  formData.initialRecommendations.recommendations
                 }
+                onChange={handleInputChange}
                 placeholder="اكتب التوصيات الخاصة بالمستفيد..."
-                className="min-h-[180px] w-full resize-y rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none transition focus:border-[#34C759]"
+                className="
+                  min-h-[180px]
+                  w-full
+                  resize-y
+                  rounded-xl
+                  border
+                  border-[#E7F0EB]
+                  bg-[#FAFDFC]
+                  px-5
+                  py-4
+                  outline-none
+                  transition
+                  focus:border-[#34C759]
+                "
               />
 
             </div>
 
           </section>
-                    {/* ================= SIGNATURES ================= */}
+
+          {/* ================= SIGNATURES ================= */}
 
           <section className="mt-12">
 
@@ -682,9 +786,6 @@ const BeneficiaryReportPage = () => {
 
                     <input
                       type="text"
-                      name="signatures.mentorSignature"
-                      value={formData.signatures.mentorSignature}
-                      onChange={handleInputChange}
                       placeholder="أدخل التوقيع"
                       className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none transition focus:border-[#34C759]"
                     />
@@ -699,9 +800,6 @@ const BeneficiaryReportPage = () => {
 
                     <input
                       type="date"
-                      name="signatures.mentorDate"
-                      value={formData.signatures.mentorDate}
-                      onChange={handleInputChange}
                       className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none transition focus:border-[#34C759]"
                     />
 
@@ -729,9 +827,6 @@ const BeneficiaryReportPage = () => {
 
                     <input
                       type="text"
-                      name="signatures.teamLeaderSignature"
-                      value={formData.signatures.teamLeaderSignature}
-                      onChange={handleInputChange}
                       placeholder="أدخل التوقيع"
                       className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none transition focus:border-[#34C759]"
                     />
@@ -746,9 +841,6 @@ const BeneficiaryReportPage = () => {
 
                     <input
                       type="date"
-                      name="signatures.teamLeaderDate"
-                      value={formData.signatures.teamLeaderDate}
-                      onChange={handleInputChange}
                       className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none transition focus:border-[#34C759]"
                     />
 

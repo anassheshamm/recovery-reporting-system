@@ -60,40 +60,40 @@ const CreatePatientPage = () => {
     }
   };
 
-  const createPatient = async (goToReport = false) => {
-    try {
-      setLoading(true);
-      setError("");
+const createPatient = async (goToReport = false) => {
+  try {
+    setLoading(true);
+    setError("");
 
-      const { data } = await patientService.createPatient(form);
+    const { data } = await patientService.createPatient(form);
 
-      alert("تم إنشاء المستفيد بنجاح");
+    alert("تم إنشاء المستفيد بنجاح");
 
-      if (goToReport) {
-        navigate(`/doctor/add-report/${data._id}`);
-      } else {
-        navigate(`/doctor/patients/${data._id}`);
-      }
-    } catch (err) {
-      console.error(err);
-
-      if (err.response?.data?.errors?.length) {
-        setError(err.response.data.errors[0].msg);
-      } else {
-        setError(
-          err.response?.data?.message ||
-            "حدث خطأ أثناء إنشاء المستفيد"
-        );
-      }
-    } finally {
-      setLoading(false);
+    if (goToReport) {
+      navigate(`/doctor/reports/beneficiary/${data._id}`);
+    } else {
+      navigate(`/doctor/patient/${data._id}`);
     }
-  };
+  } catch (err) {
+    console.error(err);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await createPatient(false);
-  };
+    if (err.response?.data?.errors?.length) {
+      setError(err.response.data.errors[0].msg);
+    } else {
+      setError(
+        err.response?.data?.message ||
+          "حدث خطأ أثناء إنشاء المستفيد"
+      );
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  await createPatient(false);
+};
+
 
   const handleSaveAndAddReport = async () => {
     await createPatient(true);

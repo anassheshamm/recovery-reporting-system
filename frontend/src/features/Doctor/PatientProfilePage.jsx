@@ -1,4 +1,4 @@
-    import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Calendar,
   Globe,
@@ -20,7 +20,7 @@ import reportService from "../../services/report.service";
 
 const PatientProfilePage = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { patientId } = useParams();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -33,18 +33,17 @@ const PatientProfilePage = () => {
 
   useEffect(() => {
     loadPatient();
-  }, [id]);
+  }, [patientId]);
 
   const loadPatient = async () => {
     try {
       setLoading(true);
       setError("");
 
-      const response =
-        await patientService.getPatient(id);
-
-      setPatient(response.data.patient);
-      setReports(response.data.reports || []);
+     const response =
+       await patientService.getPatientById(patientId);
+      setPatient(response.data);
+setReports([]);
     } catch (err) {
       console.error(err);
 
@@ -683,40 +682,37 @@ const PatientProfilePage = () => {
             <div className="grid grid-cols-2 gap-6">
 
               {/* Pre Report */}
+<button
+  onClick={() => {
+    setIsReportModalOpen(false);
 
-              <button
-                onClick={() => {
-                  setIsReportModalOpen(false);
+    navigate(
+      `/doctor/reports/beneficiary/${patient._id}`
+    );
+  }}
+  className="
+    flex
+    h-40
+    flex-col
+    items-center
+    justify-center
+    rounded-2xl
+    border
+    border-[#35C759]
+    bg-[#EDF8F2]
+    transition
+    hover:scale-105
+  "
+>
+  <FileText
+    size={40}
+    className="mb-4 text-[#247C5A]"
+  />
 
-                  navigate(
-                    `/doctor/add-pre-report/${patient._id}`
-                  );
-                }}
-                className="
-                  flex
-                  h-40
-                  flex-col
-                  items-center
-                  justify-center
-                  rounded-2xl
-                  border
-                  border-[#35C759]
-                  bg-[#EDF8F2]
-                  transition
-                  hover:scale-105
-                "
-              >
-
-                <FileText
-                  size={40}
-                  className="mb-4 text-[#247C5A]"
-                />
-
-                <span className="text-xl font-bold text-[#247C5A]">
-                  التقرير القبلي
-                </span>
-
-              </button>
+  <span className="text-xl font-bold text-[#247C5A]">
+    التقرير القبلي
+  </span>
+</button>
 
               {/* Post Report */}
 
@@ -762,7 +758,8 @@ const PatientProfilePage = () => {
 
       )}
 
-      </main>
+      </div>
+    </main>
   );
 };
 

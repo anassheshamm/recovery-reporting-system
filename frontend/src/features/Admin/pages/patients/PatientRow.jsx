@@ -2,53 +2,52 @@ import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const PatientRow = ({ patient }) => {
+  // Construct full name safely from backend fields
+  const fullName = [patient.firstName, patient.middleName, patient.lastName]
+    .filter(Boolean)
+    .join(" ");
+
+  // Extract assigned doctor full name if populated
+  const doctorName = patient.therapist
+    ? [patient.therapist.firstName, patient.therapist.middleName, patient.therapist.lastName]
+        .filter(Boolean)
+        .join(" ")
+    : "غير محدد";
+
   return (
-    <tr className="overflow-hidden rounded-2xl bg-white shadow-sm">
+    <tr className="overflow-hidden rounded-2xl bg-white shadow-sm transition hover:bg-[#FAFCFB]">
       <td className="rounded-r-2xl px-6 py-5 text-right font-medium text-[#2F2F2F]">
-        {patient.fullName}
+        {fullName || "غير محدد"}
       </td>
 
       <td className="px-6 py-5 text-right text-gray-600">
-        {patient.nationalId}
+        {patient.nationalId || "-"}
       </td>
 
       <td className="px-6 py-5 text-right text-gray-600">
-        {patient.phone}
+        {patient.phone || "-"}
       </td>
 
       <td className="px-6 py-5 text-right text-gray-600">
-        {patient.program}
+        {patient.program?.title || patient.program || "غير مسجل"}
       </td>
 
       <td className="px-6 py-5 text-right text-gray-600">
-        {patient.email}
+        {patient.email || "-"}
       </td>
 
       <td className="px-6 py-5 text-right font-medium text-[#2F2F2F]">
-        {patient.doctor}
+        {doctorName}
       </td>
 
       <td className="rounded-l-2xl px-6 py-5">
         <div className="flex justify-center">
           <Link
-            to={`/admin/patients/${patient.id}`}
-            className="
-              flex
-              items-center
-              gap-2
-              rounded-xl
-              px-4
-              py-2
-              text-[#35C759]
-              transition
-              hover:bg-[#EDF8F2]
-            "
+            to={`/admin/patients/${patient._id}`}
+            className="flex items-center gap-2 rounded-xl px-4 py-2 text-[#35C759] transition hover:bg-[#EDF8F2]"
           >
             <Eye size={18} />
-
-            <span className="font-medium">
-              Preview
-            </span>
+            <span className="font-medium">معاينة</span>
           </Link>
         </div>
       </td>

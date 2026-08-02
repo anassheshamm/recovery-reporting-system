@@ -57,7 +57,7 @@ const LoginPage = () => {
           break;
 
         case "doctor":
-          navigate("/doctor/dashboard");
+          navigate("/doctor");
           break;
 
         case "team_leader":

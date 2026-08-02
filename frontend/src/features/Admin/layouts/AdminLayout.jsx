@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/Sidebar";
 
-
 const menu = [
   {
     label: "رئيس القسم",
@@ -23,19 +22,14 @@ const menu = [
 
 const AdminLayout = () => {
   return (
-    <div
-      dir="ltr"
-      className="min-h-screen bg-[#FCFEFD]"
-    >
+    <div dir="ltr" className="min-h-screen bg-[#FCFEFD]">
       <div className="flex">
         {/* Main Content */}
-
         <main className="flex-1 px-10 py-8">
           <Outlet />
         </main>
 
         {/* Sidebar */}
-
         <Sidebar menu={menu} />
       </div>
     </div>

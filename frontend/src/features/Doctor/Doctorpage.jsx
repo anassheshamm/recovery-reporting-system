@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-
 import PageHeader from "../components/PageHeader";
 import PatientsTable from "./PatientsTable";
-
 import patientService from "../../services/patient.service";
 
-const DoctorsPage = () => {
+const DoctorsPage = ({ searchQuery = "" }) => {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -16,90 +14,64 @@ const DoctorsPage = () => {
 
   const calculateAge = (birthDate) => {
     if (!birthDate) return "-";
-
     const today = new Date();
     const birth = new Date(birthDate);
-
     let age = today.getFullYear() - birth.getFullYear();
-
     const month = today.getMonth() - birth.getMonth();
-
-    if (
-      month < 0 ||
-      (month === 0 && today.getDate() < birth.getDate())
-    ) {
+    if (month < 0 || (month === 0 && today.getDate() < birth.getDate())) {
       age--;
     }
-
     return age;
   };
 
-  const loadPatients = async () => {
-    try {
-      setLoading(true);
-      setError("");
+ const loadPatients = async () => {
+  try {
+    setLoading(true);
+    setError("");
 
-      const response = await patientService.getAllPatients();
+    const response = await patientService.getAllPatients();
 
-      const mappedPatients = response.data.map((patient) => ({
-  _id: patient._id,
+    console.log("Response:", response);
+    console.log("Response.data:", response.data);
+    console.log("Is Array:", Array.isArray(response.data));
 
-  fullName: `${patient.firstName} ${patient.middleName} ${patient.lastName}`,
+    const rawPatients = response.data || [];
 
-  age: calculateAge(patient.dateOfBirth),
+    const mappedPatients = rawPatients.map((patient) => ({
+      _id: patient._id,
+      fullName: [patient.firstName, patient.middleName, patient.lastName]
+        .filter(Boolean)
+        .join(" "),
+      age: calculateAge(patient.dateOfBirth),
+      nationalId: patient.nationalId || "-",
+      phone: patient.phone || "-",
+      email: patient.email || "-",
+      joinDate: patient.createdAt
+        ? new Date(patient.createdAt).toLocaleDateString("en-GB")
+        : "-",
+    }));
 
-  nationalId: patient.nationalId,
+    setPatients(mappedPatients);
+  } catch (err) {
+    console.error("ERROR:", err);
+    console.error("RESPONSE:", err.response);
 
-  phone: patient.phone,
+    setError(
+      err.response?.data?.message || "حدث خطأ أثناء تحميل المستفيدين"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
-  email: patient.email || "-",
-
-  joinDate: patient.createdAt
-    ? new Date(patient.createdAt).toLocaleDateString("en-GB")
-    : "-",
-
-  firstName: patient.firstName,
-  middleName: patient.middleName,
-  lastName: patient.lastName,
-
-  gender: patient.gender,
-
-  nationality: patient.nationality,
-
-  occupation: patient.occupation,
-
-  maritalStatus: patient.maritalStatus,
-
-  dateOfBirth: patient.dateOfBirth
-    ? patient.dateOfBirth.substring(0, 10)
-    : "",
-
-  alternativePhone: patient.alternativePhone,
-
-  emergencyContactPhone:
-    patient.emergencyContactPhone,
-
-  emergencyContactRelation:
-    patient.emergencyContactRelation,
-
-  address: patient.address,
-
-  doctor: patient.doctor,
-
-  isActive: patient.isActive,
-}));
-      setPatients(mappedPatients);
-    } catch (err) {
-      console.error(err);
-
-      setError(
-        err.response?.data?.message ||
-          "حدث خطأ أثناء تحميل المستفيدين"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  const filteredPatients = patients.filter((p) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      p.fullName.toLowerCase().includes(q) ||
+      (p.nationalId && p.nationalId.includes(q))
+    );
+  });
 
   return (
     <div className="mx-auto max-w-[1300px]">
@@ -118,7 +90,7 @@ const DoctorsPage = () => {
           {error}
         </div>
       ) : (
-        <PatientsTable patients={patients} />
+        <PatientsTable patients={filteredPatients} />
       )}
     </div>
   );

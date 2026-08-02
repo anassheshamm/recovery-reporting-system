@@ -29,37 +29,42 @@ const patientService = {
       nationalId: form.nationalId,
 
       gender: form.gender,
+
       nationality: form.nationality,
 
-      occupation: form.profession,
+      occupation: form.occupation,
 
       maritalStatus: form.maritalStatus,
 
-      dateOfBirth: form.birthDate,
+      dateOfBirth: form.dateOfBirth,
 
       phone: form.phone,
 
-      alternativePhone: form.anotherPhone,
+      alternativePhone: form.alternativePhone,
 
-      emergencyContactPhone: form.guardianPhone,
+      emergencyContactPhone:
+        form.emergencyContactPhone,
 
-      emergencyContactRelation: form.relation,
+      emergencyContactRelation:
+        form.emergencyContactRelation,
 
       email: form.email,
 
-      address: form.street,
-
-           
+      address: form.address,
     };
 
-    const response = await api.post("/patients", payload);
+    console.log("Patient Payload:", payload);
+
+    const response = await api.post(
+      "/patients",
+      payload
+    );
 
     return response.data;
   },
 
   // ===========================
   // Update Patient
-  // (Backend doesn't exist yet)
   // ===========================
   async updatePatient(id, form) {
     const payload = {
@@ -70,44 +75,46 @@ const patientService = {
       nationalId: form.nationalId,
 
       gender: form.gender,
+
       nationality: form.nationality,
 
-      occupation: form.profession,
+      occupation: form.occupation,
 
       maritalStatus: form.maritalStatus,
 
-      dateOfBirth: form.birthDate,
+      dateOfBirth: form.dateOfBirth,
 
       phone: form.phone,
 
-      alternativePhone: form.anotherPhone,
+      alternativePhone: form.alternativePhone,
 
-      emergencyContactPhone: form.guardianPhone,
+      emergencyContactPhone:
+        form.emergencyContactPhone,
 
-      emergencyContactRelation: form.relation,
+      emergencyContactRelation:
+        form.emergencyContactRelation,
 
       email: form.email,
 
-      address: [
-        form.country,
-        form.city,
-        form.street,
-      ]
-        .filter(Boolean)
-        .join(", "),
+      address: form.address,
     };
 
-    const response = await api.put(`/patients/${id}`, payload);
+    const response = await api.put(
+      `/patients/${id}`,
+      payload
+    );
 
     return response.data;
   },
 
   // ===========================
   // Delete Patient
-  // (Backend doesn't exist yet)
   // ===========================
   async deletePatient(id) {
-    const response = await api.delete(`/patients/${id}`);
+    const response = await api.delete(
+      `/patients/${id}`
+    );
+
     return response.data;
   },
 };

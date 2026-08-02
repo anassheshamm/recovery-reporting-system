@@ -3,12 +3,24 @@ import { NavLink } from "react-router-dom";
 import { Plus, Search } from "lucide-react";
 
 import InviteMemberModal from "../InviteMemberModal";
-import logo from "/logo.png";
 import logo2 from "/logo2.png";
 
-const Sidebar = ({ menu }) => {
+const Sidebar = ({ menu = [], onSearchChange }) => {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [search, setSearch] = useState("");
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearch(value);
+    if (onSearchChange) {
+      onSearchChange(value);
+    }
+  };
+
+  const handleMemberAdded = () => {
+    // Triggers refresh or parent callback if supplied
+    setIsInviteModalOpen(false);
+  };
 
   return (
     <>
@@ -31,14 +43,8 @@ const Sidebar = ({ menu }) => {
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
-
           <div className="mb-10 flex justify-center">
-            {/* <img
-              src={logo}
-              alt="Logo"
-              className="w-40 object-contain"
-            /> */}
-             <img
+            <img
               src={logo2}
               alt="Logo"
               className="w-40 object-contain"
@@ -46,8 +52,8 @@ const Sidebar = ({ menu }) => {
           </div>
 
           {/* Invite Member */}
-
           <button
+            type="button"
             onClick={() => setIsInviteModalOpen(true)}
             className="
               mb-8
@@ -69,12 +75,10 @@ const Sidebar = ({ menu }) => {
             "
           >
             <Plus size={22} />
-
             <span>إضافة عضو جديد</span>
           </button>
 
           {/* Search */}
-
           <div className="relative mb-8">
             <Search
               size={20}
@@ -90,7 +94,7 @@ const Sidebar = ({ menu }) => {
             <input
               type="text"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={handleSearchChange}
               placeholder="ابحث بالاسم أو رقم الهوية"
               className="
                 h-14
@@ -111,7 +115,6 @@ const Sidebar = ({ menu }) => {
           </div>
 
           {/* Navigation */}
-
           <nav className="space-y-4">
             {menu.map((item) => (
               <NavLink
@@ -145,7 +148,6 @@ const Sidebar = ({ menu }) => {
           <div className="flex-1" />
 
           {/* Footer */}
-
           <div className="pt-6 text-center text-sm text-gray-400">
             Recovery System
           </div>
@@ -155,6 +157,7 @@ const Sidebar = ({ menu }) => {
       <InviteMemberModal
         open={isInviteModalOpen}
         onClose={() => setIsInviteModalOpen(false)}
+        onSuccess={handleMemberAdded}
       />
     </>
   );

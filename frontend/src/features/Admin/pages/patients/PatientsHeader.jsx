@@ -1,6 +1,5 @@
 import { Download } from "lucide-react";
 
-
 const PageHeader = ({
   title,
   description,
@@ -8,11 +7,9 @@ const PageHeader = ({
   onDownload,
 }) => {
   return (
-    <section  className="mb-10">
-
+    <section className="mb-10">
       {/* Breadcrumb */}
-
-      <div className="mb-16  mt-16 flex justify-center text-lg">
+      <div className="mb-16 mt-16 flex justify-center text-lg">
         <span className="font-semibold text-[#1E1E1E]">
           الرئيسية
         </span>
@@ -24,34 +21,21 @@ const PageHeader = ({
         </span>
       </div>
 
-      {/* Title */}
-
+      {/* Title & Action Section */}
       <div dir="ltr" className="flex items-end justify-between">
-
         {/* Download Button */}
+        {downloadText && (
+          <button
+            onClick={onDownload}
+            type="button"
+            className="flex h-12 items-center gap-2 rounded-xl bg-[#247C5A] px-6 text-white transition hover:opacity-90"
+          >
+            <Download size={18} />
+            {downloadText}
+          </button>
+        )}
 
-        <button
-          onClick={onDownload}
-          className="
-            flex
-            h-12
-            items-center
-            gap-2
-            rounded-xl
-            bg-[#247C5A]
-            px-6
-            text-white
-            transition
-            hover:opacity-90
-          "
-        >
-          <Download size={18} />
-
-          {downloadText}
-        </button>
-
-        {/* Title */}
-
+        {/* Title and Subtitle */}
         <div className="text-right">
           <h1 className="text-[44px] font-bold text-[#202020]">
             {title}
@@ -61,13 +45,10 @@ const PageHeader = ({
             {description}
           </p>
         </div>
-
       </div>
 
       {/* Divider */}
-
       <div className="mt-8 h-px bg-[#E5F3EB]" />
-
     </section>
   );
 };
