@@ -21,7 +21,7 @@ class PatientController {
 
   async getAll(req, res, next) {
     try {
-      const patients = await patientService.getAll();
+      const patients = await patientService.getAll(req.user);
 
       res.status(200).json({
         success: true,
@@ -60,6 +60,22 @@ class PatientController {
     next(error);
   }
 }
+
+async getDashboardStats(req, res, next) {
+  try {
+    const stats = await patientService.getDashboardStats(
+      req.user._id
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: stats,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 }
 
 export default new PatientController();

@@ -23,14 +23,20 @@ class PatientService {
     );
   }
 
-  async getAll() {
-    return await Patient.find().populate(
-      "doctor",
-      "firstName middleName lastName"
-    );
+  async getAll(user) {
+  let query = {};
+
+  if (user.role === "doctor") {
+    query.doctor = user._id;
   }
 
-  
+  return await Patient.find(query).populate(
+    "doctor",
+    "firstName middleName lastName"
+  );
+}
+
+
   async getById(patientId, user) {
   let patient;
 
@@ -72,6 +78,45 @@ class PatientService {
     reports,
   };
 }
+
+async getDashboardStats(doctorId) {
+    console.log("Doctor ID:", doctorId);
+
+const reports = await PreReport.find({
+  doctor: doctorId,
+});
+
+console.log(reports);
+  const [
+    totalPatients,
+    totalReports,
+    pendingReports,
+  ] = await Promise.all([
+    Patient.countDocuments({
+      doctor: doctorId,
+    }),
+
+    PreReport.countDocuments({
+      doctor: doctorId,
+    }),
+
+    PreReport.countDocuments({
+      doctor: doctorId,
+      "approval.status": "pending",
+    }),
+  ]);
+
+  return {
+    totalPatients,
+    totalReports,
+    pendingReports,
+  };
+}
+
+
+
+
+
 }
 
 export default new PatientService();
