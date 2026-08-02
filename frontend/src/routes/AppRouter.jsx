@@ -22,17 +22,17 @@ export default function AppRouter() {
   return (
     <Routes>
       {/* ================= Authentication ================= */}
-
+<Route
+          path="/"
+          element={<LoginPage />}
+        />
       <Route element={<AuthLayout />}>
         <Route
           path="/register"
           element={<Register />}
         />
 
-        <Route
-          path="/"
-          element={<LoginPage />}
-        />
+        
 
         <Route
           path="/forgot-password"
