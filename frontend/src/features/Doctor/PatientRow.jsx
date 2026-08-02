@@ -31,7 +31,7 @@ const PatientRow = ({ patient }) => {
       <td className="rounded-l-2xl px-6 py-5">
         <div className="flex justify-center">
           <Link
-            to={`/doctor/patients/${patient.id}`}
+            to={`/doctor/patients/${patient._id}`}
             className="
               flex
               items-center

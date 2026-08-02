@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Mail,
   Lock,
@@ -7,9 +7,15 @@ import {
   EyeOff,
 } from "lucide-react";
 
+import { useAuth } from "../../context/AuthContext";
+
 import logo from "/logo2.png";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+
+  const { login } = useAuth();
+
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -19,6 +25,8 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
+
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
@@ -36,14 +44,34 @@ const LoginPage = () => {
 
     try {
       setLoading(true);
+      setError("");
 
-      // TODO:
-      // const response = await login(form);
+      const user = await login({
+        email: form.email,
+        password: form.password,
+      });
 
-      console.log(form);
+      switch (user.role) {
+        case "admin":
+          navigate("/admin/dashboard");
+          break;
 
-    } catch (error) {
-      console.error(error);
+        case "doctor":
+          navigate("/doctor/dashboard");
+          break;
+
+        case "team_leader":
+          navigate("/team-leader/dashboard");
+          break;
+
+        default:
+          navigate("/");
+      }
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          "فشل تسجيل الدخول"
+      );
     } finally {
       setLoading(false);
     }
@@ -91,7 +119,6 @@ const LoginPage = () => {
             </label>
 
             <div className="relative">
-
               <Mail
                 size={20}
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -122,7 +149,6 @@ const LoginPage = () => {
                   focus:ring-[#35C759]/10
                 "
               />
-
             </div>
           </div>
 
@@ -177,7 +203,6 @@ const LoginPage = () => {
                   focus:ring-[#35C759]/10
                 "
               />
-
             </div>
           </div>
 
@@ -199,7 +224,6 @@ const LoginPage = () => {
             </Link>
 
             <label className="flex items-center gap-2 text-sm">
-
               <span>تذكرني</span>
 
               <input
@@ -209,12 +233,19 @@ const LoginPage = () => {
                 onChange={handleChange}
                 className="h-4 w-4 accent-[#35C759]"
               />
-
             </label>
 
           </div>
 
-          {/* Login */}
+          {/* Error Message */}
+
+          {error && (
+            <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-center text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
+          {/* Login Button */}
 
           <button
             type="submit"

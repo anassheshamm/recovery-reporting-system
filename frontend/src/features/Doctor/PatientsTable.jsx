@@ -52,7 +52,7 @@ const PatientsTable = ({ patients = [] }) => {
           ) : (
             patients.map((patient) => (
               <PatientRow
-                key={patient.id}
+                key={patient._id}
                 patient={patient}
               />
             ))

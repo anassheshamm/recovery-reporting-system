@@ -8,30 +8,46 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+import patientService from "../../services/patient.service";
+
 const CreatePatientPage = () => {
   const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
+
+  const [error, setError] = useState("");
+
   const [form, setForm] = useState({
     firstName: "",
     middleName: "",
     lastName: "",
 
     nationalId: "",
+
     birthDate: "",
 
     gender: "",
+
     nationality: "",
+
     profession: "",
+
     maritalStatus: "",
 
     phone: "",
+
     anotherPhone: "",
+
     guardianPhone: "",
+
     relation: "",
 
     email: "",
 
     country: "",
+
     city: "",
+
     street: "",
   });
 
@@ -42,20 +58,145 @@ const CreatePatientPage = () => {
       ...prev,
       [name]: value,
     }));
+
+    if (error) {
+      setError("");
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Backend later
-    console.log(form);
+    try {
+      setLoading(true);
+      setError("");
+
+      const response =
+        await patientService.createPatient(form);
+
+      alert("تم إنشاء المستفيد بنجاح");
+
+      navigate(
+        `/doctor/patients/${response.data._id}`,
+        {
+          state: {
+            _id: response.data._id,
+
+            firstName: response.data.firstName,
+            middleName: response.data.middleName,
+            lastName: response.data.lastName,
+
+            nationalId: response.data.nationalId,
+
+            birthDate: response.data.dateOfBirth,
+
+            gender: response.data.gender,
+
+            nationality: response.data.nationality,
+
+            profession: response.data.occupation,
+
+            maritalStatus:
+              response.data.maritalStatus,
+
+            phone: response.data.phone,
+
+            anotherPhone:
+              response.data.alternativePhone,
+
+            guardianPhone:
+              response.data.emergencyContactPhone,
+
+            relation:
+              response.data.emergencyContactRelation,
+
+            email: response.data.email,
+
+            street: response.data.address,
+
+            country: "",
+
+            city: "",
+          },
+        }
+      );
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        err.response?.data?.message ||
+          "حدث خطأ أثناء إنشاء المستفيد"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSaveAndAddReport = () => {
-    // Backend later
-    console.log(form);
-    navigate(`/doctor/patients/${form.nationalId}`);
+  const handleSaveAndAddReport = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const response =
+        await patientService.createPatient(form);
+
+      navigate(
+        `/doctor/patients/${response.data._id}`,
+        {
+          state: {
+            _id: response.data._id,
+
+            firstName: response.data.firstName,
+            middleName: response.data.middleName,
+            lastName: response.data.lastName,
+
+            nationalId: response.data.nationalId,
+
+            birthDate: response.data.dateOfBirth,
+
+            gender: response.data.gender,
+
+            nationality: response.data.nationality,
+
+            profession: response.data.occupation,
+
+            maritalStatus:
+              response.data.maritalStatus,
+
+            phone: response.data.phone,
+
+            anotherPhone:
+              response.data.alternativePhone,
+
+            guardianPhone:
+              response.data.emergencyContactPhone,
+
+            relation:
+              response.data.emergencyContactRelation,
+
+            email: response.data.email,
+
+            street: response.data.address,
+
+            country: "",
+
+            city: "",
+          },
+        }
+      );
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        err.response?.data?.message ||
+          "حدث خطأ أثناء إنشاء المستفيد"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
+
+
 
   return (
     <main
@@ -100,7 +241,11 @@ const CreatePatientPage = () => {
           <div className="mb-16">
 
             <div className="mb-8 flex items-center gap-3">
-
+{error && (
+  <div className="mb-8 rounded-xl border border-red-200 bg-red-50 p-4 text-center text-red-600">
+    {error}
+  </div>
+)}
               <div className="rounded-xl bg-[#EAF8F1] p-3">
                 <User
                   size={24}
@@ -552,33 +697,30 @@ const CreatePatientPage = () => {
                 />
 
               </div>
-                 <div >
+               <div className="col-span-3">
+  <label className="mb-2 block font-medium">
+    العنوان
+  </label>
 
-                  <label className="mb-2 block font-medium">
-                    الدولة
-                  </label>
-
-                  <input
-                    type="text"
-                    name="country"
-                    value={form.country}
-                    onChange={handleChange}
-                    placeholder="الدولة"
-                    className="
-                      h-14
-                      w-full
-                      rounded-xl
-                      border
-                      border-gray-300
-                      pr-4
-                      pl-12
-                      text-right
-                      outline-none
-                      focus:border-[#35C759]
-                    "
-                  />
-
-                </div>
+  <input
+    type="text"
+    name="street"
+    value={form.street}
+    onChange={handleChange}
+    placeholder="العنوان"
+    className="
+      h-14
+      w-full
+      rounded-xl
+      border
+      border-gray-300
+      px-4
+      text-right
+      outline-none
+      focus:border-[#35C759]
+    "
+  />
+</div>
 
               {/* Relation */}
 
@@ -698,45 +840,55 @@ const CreatePatientPage = () => {
           {/* Buttons */}
           {/* ========================= */}
 
-          <div className="mt-16 flex items-center justify-center gap-4">
+         {/* ========================= */}
+{/* Buttons */}
+{/* ========================= */}
 
-            <button
-              type="submit"
-              className="
-                rounded-xl
-                bg-[#35C759]
-                px-8
-                py-4
-                text-lg
-                font-semibold
-                text-white
-                transition
-                hover:bg-[#2FB350]
-              "
-            >
-              حفظ المعلومات
-            </button>
+<div className="mt-16 flex items-center justify-center gap-4">
 
-            <button
-              type="button"
-              onClick={handleSaveAndAddReport}
-              className="
-                rounded-xl
-                border
-                border-[#35C759]
-                px-8
-                py-4
-                text-lg
-                font-semibold
-                text-[#247C5A]
-                transition
-                hover:bg-[#EDF8F2]
-              "
-            >
-              إضافة تقرير للملف
-            </button>
+  <button
+    type="submit"
+    disabled={loading}
+    className="
+      rounded-xl
+      bg-[#35C759]
+      px-8
+      py-4
+      text-lg
+      font-semibold
+      text-white
+      transition
+      hover:bg-[#2FB350]
+      disabled:cursor-not-allowed
+      disabled:opacity-60
+    "
+  >
+    {loading ? "جاري الحفظ..." : "حفظ المعلومات"}
+  </button>
 
-          </div>
+  <button
+    type="button"
+    disabled={loading}
+    onClick={handleSaveAndAddReport}
+    className="
+      rounded-xl
+      border
+      border-[#35C759]
+      px-8
+      py-4
+      text-lg
+      font-semibold
+      text-[#247C5A]
+      transition
+      hover:bg-[#EDF8F2]
+      disabled:cursor-not-allowed
+      disabled:opacity-60
+    "
+  >
+    {loading ? "جاري الحفظ..." : "حفظ وإضافة تقرير"}
+  </button>
+
+</div>
 
         </form>
 
