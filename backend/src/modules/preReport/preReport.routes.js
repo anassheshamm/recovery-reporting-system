@@ -20,6 +20,13 @@ router.post(
 );
 
 router.get(
+  "/my-reports",
+  protect,
+  authorize("doctor"),
+  preReportController.getMyReports
+);
+
+router.get(
   "/pending",
   protect,
   authorize("teamLeader"),

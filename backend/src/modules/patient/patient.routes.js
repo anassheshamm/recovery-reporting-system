@@ -33,4 +33,6 @@ router.get(
   patientController.getById
 );
 
+
+
 export default router;

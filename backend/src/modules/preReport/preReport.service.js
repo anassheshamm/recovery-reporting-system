@@ -175,6 +175,25 @@ async reject(reportId, teamLeaderId, reason) {
   return report;
 }
 
+async getMyReports(doctorId) {
+  const reports = await PreReport.find({
+    doctor: doctorId,
+  })
+    .populate({
+      path: "patient",
+      select: "firstName middleName lastName nationalId",
+    })
+    .populate({
+      path: "teamLeader",
+      select: "firstName lastName email",
+    })
+    .sort({
+      createdAt: -1,
+    });
+
+  return reports;
+}
+
 async getById(reportId, user) {
   const report = await PreReport.findById(reportId)
     .populate({

@@ -32,18 +32,34 @@ class PatientController {
     }
   }
 
-  async getById(req, res, next) {
-    try {
-      const patient = await patientService.findById(req.params.id);
+//   async getById(req, res, next) {
+//     try {
+//       const patient = await patientService.findById(req.params.id);
 
-      res.status(200).json({
-        success: true,
-        data: patient,
-      });
-    } catch (error) {
-      next(error);
-    }
+//       res.status(200).json({
+//         success: true,
+//         data: patient,
+//       });
+//     } catch (error) {
+//       next(error);
+//     }
+//   }
+
+  async getById(req, res, next) {
+  try {
+    const data = await patientService.getById(
+      req.params.id,
+      req.user._id
+    );
+
+    return res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    next(error);
   }
+}
 }
 
 export default new PatientController();
