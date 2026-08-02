@@ -20,17 +20,25 @@ router.post(
 );
 
 router.get(
-  "/",
+    "/",
+    protect,
+    authorize("doctor", "teamLeader", "admin"),
+    patientController.getAll
+);
+
+router.get(
+  "/dashboard",
   protect,
-  authorize("doctor", "team_leader", "admin"),
-  patientController.getAll
+  authorize("doctor"),
+  patientController.getDashboardStats
 );
 
 router.get(
   "/:id",
   protect,
-  authorize("doctor", "team_leader", "admin"),
+  authorize("doctor", "teamLeader", "admin"),
   patientController.getById
 );
+
 
 export default router;
