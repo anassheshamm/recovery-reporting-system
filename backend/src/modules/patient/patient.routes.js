@@ -22,14 +22,14 @@ router.post(
 router.get(
   "/",
   protect,
-  authorize("doctor", "team_leader", "admin"),
+  authorize("doctor", "teamLeader", "admin"),
   patientController.getAll
 );
 
 router.get(
   "/:id",
   protect,
-  authorize("doctor", "team_leader", "admin"),
+  authorize("doctor", "teamLeader", "admin"),
   patientController.getById
 );
 
