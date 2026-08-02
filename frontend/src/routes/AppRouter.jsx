@@ -30,7 +30,7 @@ export default function AppRouter() {
         />
 
         <Route
-          path="/login"
+          path="/"
           element={<LoginPage />}
         />
 
