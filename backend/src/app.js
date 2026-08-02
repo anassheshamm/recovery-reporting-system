@@ -25,11 +25,7 @@ app.use(compression());
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // Local Vite
-      "https://recovery-reporting-system.vercel.app", // Production
-      "https://recovery-reporting-system-3vlbbv6g1-anassheshamms-projects.vercel.app", // Preview
-    ],
+    origin: true,
     credentials: true,
   })
 );
