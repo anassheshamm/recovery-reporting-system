@@ -42,8 +42,12 @@ const PatientProfilePage = () => {
 
      const response =
        await patientService.getPatientById(patientId);
-      setPatient(response.data);
-setReports([]);
+       console.log(response);
+console.log(response.data);
+console.log(response.data.patient);
+console.log(response.data.reports);
+setPatient(response.data.patient);
+setReports(response.data.reports);
     } catch (err) {
       console.error(err);
 
