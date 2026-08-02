@@ -42,55 +42,52 @@ const DoctorsPage = () => {
       const response = await patientService.getAllPatients();
 
       const mappedPatients = response.data.map((patient) => ({
-        _id: patient._id,
+  _id: patient._id,
 
-        fullName: `${patient.firstName} ${patient.middleName} ${patient.lastName}`,
+  fullName: `${patient.firstName} ${patient.middleName} ${patient.lastName}`,
 
-        age: calculateAge(patient.dateOfBirth),
+  age: calculateAge(patient.dateOfBirth),
 
-        nationalId: patient.nationalId,
+  nationalId: patient.nationalId,
 
-        phone: patient.phone,
+  phone: patient.phone,
 
-        email: patient.email || "-",
+  email: patient.email || "-",
 
-        joinDate: patient.createdAt
-          ? new Date(patient.createdAt).toLocaleDateString("en-GB")
-          : "-",
+  joinDate: patient.createdAt
+    ? new Date(patient.createdAt).toLocaleDateString("en-GB")
+    : "-",
 
-        firstName: patient.firstName,
-        middleName: patient.middleName,
-        lastName: patient.lastName,
+  firstName: patient.firstName,
+  middleName: patient.middleName,
+  lastName: patient.lastName,
 
-        gender: patient.gender,
+  gender: patient.gender,
 
-        nationality: patient.nationality,
+  nationality: patient.nationality,
 
-        profession: patient.occupation,
+  occupation: patient.occupation,
 
-        maritalStatus: patient.maritalStatus,
+  maritalStatus: patient.maritalStatus,
 
-        birthDate: patient.dateOfBirth
-          ? patient.dateOfBirth.substring(0, 10)
-          : "",
+  dateOfBirth: patient.dateOfBirth
+    ? patient.dateOfBirth.substring(0, 10)
+    : "",
 
-        anotherPhone: patient.alternativePhone,
+  alternativePhone: patient.alternativePhone,
 
-        guardianPhone: patient.emergencyContactPhone,
+  emergencyContactPhone:
+    patient.emergencyContactPhone,
 
-        relation: patient.emergencyContactRelation,
+  emergencyContactRelation:
+    patient.emergencyContactRelation,
 
-        email: patient.email,
+  address: patient.address,
 
-        country: "",
-        city: "",
-        street: patient.address,
+  doctor: patient.doctor,
 
-        doctor: patient.doctor,
-
-        isActive: patient.isActive,
-      }));
-
+  isActive: patient.isActive,
+}));
       setPatients(mappedPatients);
     } catch (err) {
       console.error(err);

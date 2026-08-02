@@ -1,8 +1,48 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Search, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
+
+import patientService from "../../services/patient.service";
+import reportService from "../../services/report.service";
+
 const DoctorSidebar = () => {
   const [search, setSearch] = useState("");
+
+  const [statistics, setStatistics] = useState({
+    patients: 0,
+    reports: 0,
+    pendingReports: 0,
+  });
+
+  useEffect(() => {
+    loadStatistics();
+  }, []);
+
+  const loadStatistics = async () => {
+    try {
+      const [patientsResponse, reportsResponse] =
+        await Promise.all([
+          patientService.getAllPatients(),
+          reportService.getAllReports(),
+        ]);
+
+      const patients = patientsResponse.data || [];
+      const reports = reportsResponse.data || [];
+
+      setStatistics({
+        patients: patients.length,
+
+        reports: reports.length,
+
+        pendingReports: reports.filter(
+          (report) =>
+            report.approval?.status === "pending"
+        ).length,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <aside
@@ -36,29 +76,30 @@ const DoctorSidebar = () => {
 
         {/* Create Patient */}
 
-      <Link to="/doctor/new"
-  className="
-    mb-6
-    flex
-    h-14
-    w-full
-    items-center
-    justify-center
-    gap-2
-    rounded-2xl
-    bg-[#35C759]
-    text-lg
-    font-semibold
-    text-white
-    transition-all
-    duration-200
-    hover:bg-[#2FB350]
-    active:scale-[0.98]
-  "
->
-  <Plus size={22} />
-  <span>إنشاء ملف مستفيد جديد</span>
-</Link>
+        <Link
+          to="/doctor/new"
+          className="
+            mb-6
+            flex
+            h-14
+            w-full
+            items-center
+            justify-center
+            gap-2
+            rounded-2xl
+            bg-[#35C759]
+            text-lg
+            font-semibold
+            text-white
+            transition-all
+            duration-200
+            hover:bg-[#2FB350]
+            active:scale-[0.98]
+          "
+        >
+          <Plus size={22} />
+          <span>إنشاء ملف مستفيد جديد</span>
+        </Link>
 
         {/* Search */}
 
@@ -78,7 +119,9 @@ const DoctorSidebar = () => {
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
             placeholder="ابحث بالاسم أو رقم الهوية"
             className="
               h-14
@@ -99,7 +142,8 @@ const DoctorSidebar = () => {
 
         {/* Fill Report */}
 
-        <button
+        <Link
+          to="/doctor/patients"
           className="
             mb-10
             flex
@@ -118,7 +162,13 @@ const DoctorSidebar = () => {
         >
           <Plus
             size={18}
-            className="rounded-md border border-[#35C759] p-0.5 text-[#35C759]"
+            className="
+              rounded-md
+              border
+              border-[#35C759]
+              p-0.5
+              text-[#35C759]
+            "
           />
 
           <span className="font-medium text-[#2F2F2F]">
@@ -129,34 +179,40 @@ const DoctorSidebar = () => {
             size={18}
             className="text-transparent"
           />
-        </button>
+        </Link>
 
         {/* Statistics */}
 
         <div className="space-y-6">
 
           <div className="flex items-center justify-between text-base">
+
             <span>عدد المستفيدين</span>
 
-            <span className="font-bold">
-              0
+            <span className="font-bold text-[#247C5A]">
+              {statistics.patients}
             </span>
+
           </div>
 
           <div className="flex items-center justify-between text-base">
+
             <span>عدد التقارير</span>
 
-            <span className="font-bold">
-              0
+            <span className="font-bold text-[#247C5A]">
+              {statistics.reports}
             </span>
+
           </div>
 
           <div className="flex items-center justify-between text-base">
-            <span>تقارير غير مكتملة</span>
 
-            <span className="font-bold">
-              0
+            <span>تقارير قيد المراجعة</span>
+
+            <span className="font-bold text-[#247C5A]">
+              {statistics.pendingReports}
             </span>
+
           </div>
 
         </div>

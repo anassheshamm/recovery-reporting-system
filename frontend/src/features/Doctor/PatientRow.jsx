@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 const PatientRow = ({ patient }) => {
   return (
     <tr className="bg-white shadow-sm">
+
       <td className="rounded-r-2xl px-6 py-5 text-right font-medium text-[#2F2F2F]">
         {patient.fullName}
       </td>
@@ -25,11 +26,12 @@ const PatientRow = ({ patient }) => {
       </td>
 
       <td className="px-6 py-5 text-right text-gray-600">
-        {patient.email}
+        {patient.email || "-"}
       </td>
 
       <td className="rounded-l-2xl px-6 py-5">
         <div className="flex justify-center">
+
           <Link
             to={`/doctor/patients/${patient._id}`}
             className="
@@ -39,19 +41,19 @@ const PatientRow = ({ patient }) => {
               rounded-xl
               px-4
               py-2
+              font-medium
               text-[#35C759]
               transition
               hover:bg-[#EDF8F2]
             "
           >
             <Eye size={18} />
-
-            <span className="font-medium">
-              Preview
-            </span>
+            <span>عرض</span>
           </Link>
+
         </div>
       </td>
+
     </tr>
   );
 };

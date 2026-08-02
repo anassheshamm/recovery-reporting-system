@@ -3,12 +3,16 @@ import PatientRow from "./PatientRow";
 const PatientsTable = ({ patients = [] }) => {
   return (
     <div className="overflow-hidden rounded-[28px] bg-white shadow-sm">
+
       <table
         dir="rtl"
         className="w-full border-separate border-spacing-y-4"
       >
+
         <thead>
+
           <tr className="bg-[#EDF8F2] text-[#2F2F2F]">
+
             <th className="rounded-r-2xl px-6 py-5 text-right font-semibold">
               الاسم
             </th>
@@ -34,31 +38,43 @@ const PatientsTable = ({ patients = [] }) => {
             </th>
 
             <th className="rounded-l-2xl px-6 py-5 text-center font-semibold">
-              رؤية الملف
+              عرض الملف
             </th>
+
           </tr>
+
         </thead>
 
         <tbody>
+
           {patients.length === 0 ? (
+
             <tr>
+
               <td
                 colSpan={7}
-                className="py-16 text-center text-gray-400"
+                className="py-20 text-center text-gray-400"
               >
                 لا يوجد مستفيدون
               </td>
+
             </tr>
+
           ) : (
+
             patients.map((patient) => (
               <PatientRow
                 key={patient._id}
                 patient={patient}
               />
             ))
+
           )}
+
         </tbody>
+
       </table>
+
     </div>
   );
 };

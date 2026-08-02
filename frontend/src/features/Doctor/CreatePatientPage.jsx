@@ -14,9 +14,9 @@ const CreatePatientPage = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState("");
 
+  // Backend field names
   const [form, setForm] = useState({
     firstName: "",
     middleName: "",
@@ -24,31 +24,27 @@ const CreatePatientPage = () => {
 
     nationalId: "",
 
-    birthDate: "",
-
     gender: "",
 
     nationality: "",
 
-    profession: "",
+    dateOfBirth: "",
+
+    occupation: "",
 
     maritalStatus: "",
 
     phone: "",
 
-    anotherPhone: "",
+    alternativePhone: "",
 
-    guardianPhone: "",
+    emergencyContactPhone: "",
 
-    relation: "",
+    emergencyContactRelation: "",
 
     email: "",
 
-    country: "",
-
-    city: "",
-
-    street: "",
+    address: "",
   });
 
   const handleChange = (e) => {
@@ -64,139 +60,44 @@ const CreatePatientPage = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const createPatient = async (goToReport = false) => {
     try {
       setLoading(true);
       setError("");
 
-      const response =
-        await patientService.createPatient(form);
+      const { data } = await patientService.createPatient(form);
 
       alert("تم إنشاء المستفيد بنجاح");
 
-      navigate(
-        `/doctor/patients/${response.data._id}`,
-        {
-          state: {
-            _id: response.data._id,
-
-            firstName: response.data.firstName,
-            middleName: response.data.middleName,
-            lastName: response.data.lastName,
-
-            nationalId: response.data.nationalId,
-
-            birthDate: response.data.dateOfBirth,
-
-            gender: response.data.gender,
-
-            nationality: response.data.nationality,
-
-            profession: response.data.occupation,
-
-            maritalStatus:
-              response.data.maritalStatus,
-
-            phone: response.data.phone,
-
-            anotherPhone:
-              response.data.alternativePhone,
-
-            guardianPhone:
-              response.data.emergencyContactPhone,
-
-            relation:
-              response.data.emergencyContactRelation,
-
-            email: response.data.email,
-
-            street: response.data.address,
-
-            country: "",
-
-            city: "",
-          },
-        }
-      );
+      if (goToReport) {
+        navigate(`/doctor/add-report/${data._id}`);
+      } else {
+        navigate(`/doctor/patients/${data._id}`);
+      }
     } catch (err) {
       console.error(err);
 
-      setError(
-        err.response?.data?.message ||
-          "حدث خطأ أثناء إنشاء المستفيد"
-      );
+      if (err.response?.data?.errors?.length) {
+        setError(err.response.data.errors[0].msg);
+      } else {
+        setError(
+          err.response?.data?.message ||
+            "حدث خطأ أثناء إنشاء المستفيد"
+        );
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await createPatient(false);
   };
 
   const handleSaveAndAddReport = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const response =
-        await patientService.createPatient(form);
-
-      navigate(
-        `/doctor/patients/${response.data._id}`,
-        {
-          state: {
-            _id: response.data._id,
-
-            firstName: response.data.firstName,
-            middleName: response.data.middleName,
-            lastName: response.data.lastName,
-
-            nationalId: response.data.nationalId,
-
-            birthDate: response.data.dateOfBirth,
-
-            gender: response.data.gender,
-
-            nationality: response.data.nationality,
-
-            profession: response.data.occupation,
-
-            maritalStatus:
-              response.data.maritalStatus,
-
-            phone: response.data.phone,
-
-            anotherPhone:
-              response.data.alternativePhone,
-
-            guardianPhone:
-              response.data.emergencyContactPhone,
-
-            relation:
-              response.data.emergencyContactRelation,
-
-            email: response.data.email,
-
-            street: response.data.address,
-
-            country: "",
-
-            city: "",
-          },
-        }
-      );
-    } catch (err) {
-      console.error(err);
-
-      setError(
-        err.response?.data?.message ||
-          "حدث خطأ أثناء إنشاء المستفيد"
-      );
-    } finally {
-      setLoading(false);
-    }
+    await createPatient(true);
   };
-
-
 
   return (
     <main
@@ -234,6 +135,12 @@ const CreatePatientPage = () => {
 
         <form onSubmit={handleSubmit}>
 
+          {error && (
+            <div className="mb-8 rounded-xl border border-red-200 bg-red-50 p-4 text-center text-red-600">
+              {error}
+            </div>
+          )}
+
           {/* ========================= */}
           {/* Personal Information */}
           {/* ========================= */}
@@ -241,11 +148,7 @@ const CreatePatientPage = () => {
           <div className="mb-16">
 
             <div className="mb-8 flex items-center gap-3">
-{error && (
-  <div className="mb-8 rounded-xl border border-red-200 bg-red-50 p-4 text-center text-red-600">
-    {error}
-  </div>
-)}
+
               <div className="rounded-xl bg-[#EAF8F1] p-3">
                 <User
                   size={24}
@@ -361,7 +264,7 @@ const CreatePatientPage = () => {
                   name="nationalId"
                   value={form.nationalId}
                   onChange={handleChange}
-                  placeholder="1234567890123"
+                  placeholder="12345678901234"
                   className="
                     h-14
                     w-full
@@ -397,7 +300,6 @@ const CreatePatientPage = () => {
                     border-gray-300
                     bg-white
                     px-4
-                    text-right
                     outline-none
                     focus:border-[#35C759]
                   "
@@ -430,13 +332,7 @@ const CreatePatientPage = () => {
 
                   <Globe
                     size={18}
-                    className="
-                      absolute
-                      left-4
-                      top-1/2
-                      -translate-y-1/2
-                      text-gray-400
-                    "
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
                   />
 
                   <input
@@ -444,7 +340,7 @@ const CreatePatientPage = () => {
                     name="nationality"
                     value={form.nationality}
                     onChange={handleChange}
-                    placeholder="السعودية"
+                    placeholder="الجنسية"
                     className="
                       h-14
                       w-full
@@ -453,7 +349,6 @@ const CreatePatientPage = () => {
                       border-gray-300
                       pr-4
                       pl-12
-                      text-right
                       outline-none
                       focus:border-[#35C759]
                     "
@@ -463,7 +358,7 @@ const CreatePatientPage = () => {
 
               </div>
 
-              {/* Birth Date */}
+              {/* Date Of Birth */}
 
               <div>
 
@@ -475,19 +370,13 @@ const CreatePatientPage = () => {
 
                   <Calendar
                     size={18}
-                    className="
-                      absolute
-                      left-4
-                      top-1/2
-                      -translate-y-1/2
-                      text-gray-400
-                    "
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
                   />
 
                   <input
                     type="date"
-                    name="birthDate"
-                    value={form.birthDate}
+                    name="dateOfBirth"
+                    value={form.dateOfBirth}
                     onChange={handleChange}
                     className="
                       h-14
@@ -497,7 +386,6 @@ const CreatePatientPage = () => {
                       border-gray-300
                       pr-4
                       pl-12
-                      text-right
                       outline-none
                       focus:border-[#35C759]
                     "
@@ -507,7 +395,7 @@ const CreatePatientPage = () => {
 
               </div>
 
-              {/* Profession */}
+              {/* Occupation */}
 
               <div>
 
@@ -517,8 +405,8 @@ const CreatePatientPage = () => {
 
                 <input
                   type="text"
-                  name="profession"
-                  value={form.profession}
+                  name="occupation"
+                  value={form.occupation}
                   onChange={handleChange}
                   placeholder="المهنة"
                   className="
@@ -528,7 +416,6 @@ const CreatePatientPage = () => {
                     border
                     border-gray-300
                     px-4
-                    text-right
                     outline-none
                     focus:border-[#35C759]
                   "
@@ -556,7 +443,6 @@ const CreatePatientPage = () => {
                     border-gray-300
                     bg-white
                     px-4
-                    text-right
                     outline-none
                     focus:border-[#35C759]
                   "
@@ -624,7 +510,7 @@ const CreatePatientPage = () => {
                   name="phone"
                   value={form.phone}
                   onChange={handleChange}
-                  placeholder="+966 5XXXXXXXX"
+                  placeholder="01000000000"
                   className="
                     h-14
                     w-full
@@ -640,20 +526,20 @@ const CreatePatientPage = () => {
 
               </div>
 
-              {/* Another Phone */}
+              {/* Alternative Phone */}
 
               <div>
 
                 <label className="mb-2 block font-medium">
-                  رقم الهاتف الآخر
+                  رقم هاتف بديل
                 </label>
 
                 <input
                   type="tel"
-                  name="anotherPhone"
-                  value={form.anotherPhone}
+                  name="alternativePhone"
+                  value={form.alternativePhone}
                   onChange={handleChange}
-                  placeholder="+966 5XXXXXXXX"
+                  placeholder="01000000001"
                   className="
                     h-14
                     w-full
@@ -669,20 +555,20 @@ const CreatePatientPage = () => {
 
               </div>
 
-              {/* Guardian Phone */}
+              {/* Emergency Contact Phone */}
 
               <div>
 
                 <label className="mb-2 block font-medium">
-                  رقم هاتف الكفيل
+                  رقم هاتف الطوارئ
                 </label>
 
                 <input
                   type="tel"
-                  name="guardianPhone"
-                  value={form.guardianPhone}
+                  name="emergencyContactPhone"
+                  value={form.emergencyContactPhone}
                   onChange={handleChange}
-                  placeholder="+966 5XXXXXXXX"
+                  placeholder="01000000002"
                   className="
                     h-14
                     w-full
@@ -697,32 +583,37 @@ const CreatePatientPage = () => {
                 />
 
               </div>
-               <div className="col-span-3">
-  <label className="mb-2 block font-medium">
-    العنوان
-  </label>
 
-  <input
-    type="text"
-    name="street"
-    value={form.street}
-    onChange={handleChange}
-    placeholder="العنوان"
-    className="
-      h-14
-      w-full
-      rounded-xl
-      border
-      border-gray-300
-      px-4
-      text-right
-      outline-none
-      focus:border-[#35C759]
-    "
-  />
-</div>
+              {/* Address */}
 
-              {/* Relation */}
+              <div className="col-span-3">
+
+                <label className="mb-2 block font-medium">
+                  العنوان
+                </label>
+
+                <input
+                  type="text"
+                  name="address"
+                  value={form.address}
+                  onChange={handleChange}
+                  placeholder="القاهرة - مصر"
+                  className="
+                    h-14
+                    w-full
+                    rounded-xl
+                    border
+                    border-gray-300
+                    px-4
+                    text-right
+                    outline-none
+                    focus:border-[#35C759]
+                  "
+                />
+
+              </div>
+
+              {/* Emergency Contact Relation */}
 
               <div>
 
@@ -731,8 +622,8 @@ const CreatePatientPage = () => {
                 </label>
 
                 <select
-                  name="relation"
-                  value={form.relation}
+                  name="emergencyContactRelation"
+                  value={form.emergencyContactRelation}
                   onChange={handleChange}
                   className="
                     h-14
@@ -751,32 +642,36 @@ const CreatePatientPage = () => {
                     اختر
                   </option>
 
-                  <option value="father">
+                  <option value="Father">
                     الأب
                   </option>
 
-                  <option value="mother">
+                  <option value="Mother">
                     الأم
                   </option>
 
-                  <option value="brother">
+                  <option value="Brother">
                     الأخ
                   </option>
 
-                  <option value="sister">
+                  <option value="Sister">
                     الأخت
                   </option>
 
-                  <option value="husband">
+                  <option value="Husband">
                     الزوج
                   </option>
 
-                  <option value="wife">
+                  <option value="Wife">
                     الزوجة
                   </option>
 
-                  <option value="relative">
+                  <option value="Relative">
                     قريب
+                  </option>
+
+                  <option value="Friend">
+                    صديق
                   </option>
 
                 </select>
@@ -809,7 +704,7 @@ const CreatePatientPage = () => {
                     name="email"
                     value={form.email}
                     onChange={handleChange}
-                    placeholder="your.email@example.com"
+                    placeholder="example@email.com"
                     className="
                       h-14
                       w-full
@@ -823,76 +718,71 @@ const CreatePatientPage = () => {
                       focus:border-[#35C759]
                     "
                   />
-                  
 
                 </div>
-              
-
 
               </div>
 
             </div>
 
-            
-
           </div>
-                    {/* ========================= */}
+
+          {/* ========================= */}
           {/* Buttons */}
           {/* ========================= */}
 
-         {/* ========================= */}
-{/* Buttons */}
-{/* ========================= */}
+          <div className="mt-16 flex items-center justify-center gap-4">
 
-<div className="mt-16 flex items-center justify-center gap-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="
+                rounded-xl
+                bg-[#35C759]
+                px-8
+                py-4
+                text-lg
+                font-semibold
+                text-white
+                transition
+                hover:bg-[#2FB350]
+                disabled:cursor-not-allowed
+                disabled:opacity-60
+              "
+            >
+              {loading ? "جاري الحفظ..." : "حفظ المعلومات"}
+            </button>
 
-  <button
-    type="submit"
-    disabled={loading}
-    className="
-      rounded-xl
-      bg-[#35C759]
-      px-8
-      py-4
-      text-lg
-      font-semibold
-      text-white
-      transition
-      hover:bg-[#2FB350]
-      disabled:cursor-not-allowed
-      disabled:opacity-60
-    "
-  >
-    {loading ? "جاري الحفظ..." : "حفظ المعلومات"}
-  </button>
+            <button
+              type="button"
+              disabled={loading}
+              onClick={handleSaveAndAddReport}
+              className="
+                rounded-xl
+                border
+                border-[#35C759]
+                px-8
+                py-4
+                text-lg
+                font-semibold
+                text-[#247C5A]
+                transition
+                hover:bg-[#EDF8F2]
+                disabled:cursor-not-allowed
+                disabled:opacity-60
+              "
+            >
+              {loading
+                ? "جاري الحفظ..."
+                : "حفظ وإضافة تقرير"}
+            </button>
 
-  <button
-    type="button"
-    disabled={loading}
-    onClick={handleSaveAndAddReport}
-    className="
-      rounded-xl
-      border
-      border-[#35C759]
-      px-8
-      py-4
-      text-lg
-      font-semibold
-      text-[#247C5A]
-      transition
-      hover:bg-[#EDF8F2]
-      disabled:cursor-not-allowed
-      disabled:opacity-60
-    "
-  >
-    {loading ? "جاري الحفظ..." : "حفظ وإضافة تقرير"}
-  </button>
-
-</div>
+          </div>
 
         </form>
 
       </div>
+
     </main>
   );
 };
