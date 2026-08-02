@@ -19,18 +19,21 @@ class PatientController {
     }
   }
 
-  async getAll(req, res, next) {
-    try {
-      const patients = await patientService.getAll(req.user);
+async getAll(req, res, next) {
+  try {
+    const patients = await patientService.getAll(
+      req.user,
+      req.query.search
+    );
 
-      res.status(200).json({
-        success: true,
-        data: patients,
-      });
-    } catch (error) {
-      next(error);
-    }
+    return res.status(200).json({
+      success: true,
+      data: patients,
+    });
+  } catch (error) {
+    next(error);
   }
+}
 
 //   async getById(req, res, next) {
 //     try {

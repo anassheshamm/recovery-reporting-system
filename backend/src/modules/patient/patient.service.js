@@ -23,19 +23,53 @@ class PatientService {
     );
   }
 
-  async getAll(user) {
-  let query = {};
+  async getAll(user, search) {
+  const query = {};
 
+  // Doctor can only see his patients
   if (user.role === "doctor") {
     query.doctor = user._id;
   }
 
-  return await Patient.find(query).populate(
-    "doctor",
-    "firstName middleName lastName"
-  );
-}
+  // Search by name or national ID
+  if (search) {
+    query.$or = [
+      {
+        firstName: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        middleName: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        lastName: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        nationalId: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+    ];
+  }
 
+  return await Patient.find(query)
+    .populate(
+      "doctor",
+      "firstName middleName lastName"
+    )
+    .sort({
+      createdAt: -1,
+    });
+}
 
   async getById(patientId, user) {
   let patient;
