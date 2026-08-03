@@ -17,6 +17,9 @@ import CreatePatientPage from "../features/Doctor/CreatePatientPage";
 import PatientProfilePage from "../features/Doctor/PatientProfilePage";
 import BeneficiaryReportPage from "../features/reports/BeneficiaryReportPage";
 import DoctorsPage from "../features/Doctor/Doctorpage";
+import ReportPreviewPage from "../features/reports/ReportPreviewPage";
+import SecondaryReport from "../features/reports/PostReportPage";
+import PostReportPage from "../features/reports/PostReportPage";
 
 export default function AppRouter() {
   return (
@@ -48,7 +51,7 @@ export default function AppRouter() {
       {/* ================= Admin ================= */}
 
       <Route
-        path="/admin"
+        path="/admin/dashboard"
         element={<AdminLayout />}
       >
         <Route
@@ -100,7 +103,19 @@ export default function AppRouter() {
           path="reports/beneficiary/:patientId"
           element={<BeneficiaryReportPage />}
         />
+
+        {/* Secondary Report */}
+
+        <Route
+          path="reports/secondary/:patientId"
+          element={<PostReportPage />}
+        />
       </Route>
+
+      <Route
+        path="/doctor/pre-reports/:reportId"
+        element={<ReportPreviewPage />}
+      />
     </Routes>
   );
 }

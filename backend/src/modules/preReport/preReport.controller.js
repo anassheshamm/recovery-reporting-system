@@ -18,6 +18,19 @@ class PreReportController {
     }
   }
 
+   async getByPatient(req, res, next) {
+    try {
+      const reports = await preReportService.getByPatientId(req.params.patientId);
+      return res.status(200).json({
+        success: true,
+        data: reports,
+      });
+    } catch (error) {
+      next(error);
+    }
+   }
+
+
   async getPending(req, res, next) {
   try {
     const reports = await preReportService.getPendingReports(req.user._id);

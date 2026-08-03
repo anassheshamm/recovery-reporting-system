@@ -22,6 +22,10 @@ class ReportService {
       reason,
     });
   }
+
+  getReportsByPatient(patientId) {
+    return api.get(`/pre-reports/patient/${patientId}`);
+  }
 }
 
 export default new ReportService();

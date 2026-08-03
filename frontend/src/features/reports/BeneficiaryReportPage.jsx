@@ -53,9 +53,10 @@ const BeneficiaryReportPage = () => {
   const loadPatient = async () => {
     try {
       setLoading(true);
-
-      const response = await patientService.getPatient(patientId);
-
+      
+      // Update this line from getPatient to getPatientById
+      const response = await patientService.getPatientById(patientId);
+      
       setPatient(response.data?.data?.patient || response.data);
     } catch (error) {
       console.error(error);
@@ -177,7 +178,7 @@ const BeneficiaryReportPage = () => {
 
       alert("Report created successfully.");
 
-      navigate(`/doctor/patients/${patientId}`);
+      navigate(`/doctor/patient/${patientId}`);
     } catch (error) {
       console.error(error);
 

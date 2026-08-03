@@ -7,7 +7,7 @@ import {
   User,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import BackButton from "../components/BackButton";
 import patientService from "../../services/patient.service";
 
 const CreatePatientPage = () => {
@@ -106,18 +106,7 @@ const handleSubmit = async (e) => {
     >
       <div className="mx-auto max-w-[1500px]">
 
-        {/* Breadcrumb */}
-
-        <div className="mb-8 text-lg text-gray-400">
-          الرئيسية
-          <span className="mx-2 text-[#35C759]">/</span>
-
-          المستفيدين
-
-          <span className="mx-2 text-[#35C759]">/</span>
-
-          إضافة مستفيد جديد
-        </div>
+       <BackButton />
 
         {/* Title */}
 

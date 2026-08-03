@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { X, Loader2 } from "lucide-react";
+import api from "../../services/api"; // Import your centralized API service
 
 const InviteMemberModal = ({ open, onClose, onSuccess }) => {
   const [email, setEmail] = useState("");
@@ -10,28 +10,17 @@ const InviteMemberModal = ({ open, onClose, onSuccess }) => {
 
   if (!open) return null;
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1";
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!email || !role) return;
 
     try {
       setSubmitting(true);
       setError("");
-
-      const token = localStorage.getItem("token"); // Retrieve JWT auth token
-
-      const response = await axios.post(
-        `${API_BASE_URL}/users/invite`,
-        { email, role },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      
+      // Use the api instance which automatically attaches the token
+      // Point to the correct backend route: /invitations
+      const response = await api.post("/invitations", { email, role });
 
       if (response.data.success || response.status === 200 || response.status === 201) {
         setEmail("");
@@ -41,12 +30,14 @@ const InviteMemberModal = ({ open, onClose, onSuccess }) => {
       }
     } catch (err) {
       setError(
-        err.response?.data?.message || "حدث خطأ أثناء إرسال الدعوة، يرجى المحاولة لاحقاً"
+        err.response?.data?.message || "An error occurred while sending the invitation."
       );
     } finally {
       setSubmitting(false);
     }
   };
+
+  // ... rest of your component remains the same
 
   const handleClose = () => {
     if (submitting) return;

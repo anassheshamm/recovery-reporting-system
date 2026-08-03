@@ -27,6 +27,13 @@ router.get(
 );
 
 router.get(
+  "/patient/:patientId",
+  protect,
+  authorize("doctor", "teamLeader", "admin"),
+  preReportController.getByPatient
+);
+
+router.get(
   "/:id",
   protect,
   authorize("doctor", "teamLeader", "admin"),

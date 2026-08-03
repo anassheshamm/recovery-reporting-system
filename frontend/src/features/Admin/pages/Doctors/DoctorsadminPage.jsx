@@ -1,26 +1,21 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import PageHeader from "../../../components/PageHeader";
 import DoctorsTable from "./DoctorsTable";
+import api from "../../../../services/api"; // Import centralized API
 
 const DoctorsadminPage = () => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1";
-
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("token"); // Retrieve JWT stored upon login
-
-        // Fetch user/doctor list with Bearer token
-        const response = await axios.get(`${API_BASE_URL}/Patients`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        
+        // Use api instance and point to /users with role filter
+        const response = await api.get("/users", {
+          params: { role: "doctor" } 
         });
 
         if (response.data.success) {
@@ -28,7 +23,7 @@ const DoctorsadminPage = () => {
         }
       } catch (err) {
         setError(
-          err.response?.data?.message || "حدث خطأ أثناء تحميل بيانات المعالجين"
+          err.response?.data?.message || "Failed to load doctors."
         );
       } finally {
         setLoading(false);
@@ -36,7 +31,9 @@ const DoctorsadminPage = () => {
     };
 
     fetchDoctors();
-  }, [API_BASE_URL]);
+  }, []);
+
+  // ... rest of your component remains the same
 
   return (
     <div dir="rtl" className="mx-auto max-w-[1300px]">

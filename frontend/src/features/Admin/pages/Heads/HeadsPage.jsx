@@ -1,40 +1,33 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import HeadsHeader from "./HeadsHeader";
 import HeadsTable from "./HeadsTable";
+import api from "../../../../services/api"; // Import centralized API
 
 const HeadsPage = () => {
   const [heads, setHeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1";
-
   useEffect(() => {
     const fetchHeads = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("token"); // Retrieve stored JWT auth token
-
-        const response = await axios.get(`${API_BASE_URL}/users`, {
-          params: { role: "head" }, // Optional query filtering if supported by endpoint
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        
+        // Use api instance
+        const response = await api.get("/users", {
+          params: { role: "head" } 
         });
 
         if (response.data.success) {
-          // Filter client-side if backend returns all users
           const allUsers = response.data.data || [];
           const headsList = allUsers.filter(
-            (u) => u.role === "head" || u.role === "head_of_department"
+            (u) => u.role === "head" || u.role === "teamLeader" // Adjusted backend role name
           );
-
           setHeads(headsList.length ? headsList : allUsers);
         }
       } catch (err) {
         setError(
-          err.response?.data?.message || "حدث خطأ أثناء تحميل بيانات رؤساء الأقسام"
+          err.response?.data?.message || "Failed to load heads of department."
         );
       } finally {
         setLoading(false);
@@ -42,7 +35,9 @@ const HeadsPage = () => {
     };
 
     fetchHeads();
-  }, [API_BASE_URL]);
+  }, []);
+
+  // ... rest of your component remains the same
 
   const handleDownload = () => {
     if (!heads.length) return;

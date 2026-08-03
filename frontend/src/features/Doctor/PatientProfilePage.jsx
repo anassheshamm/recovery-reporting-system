@@ -14,7 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-
+import BackButton from "../components/BackButton";
 import patientService from "../../services/patient.service";
 import reportService from "../../services/report.service";
 
@@ -35,21 +35,24 @@ const PatientProfilePage = () => {
     loadPatient();
   }, [patientId]);
 
-  const loadPatient = async () => {
+ const loadPatient = async () => {
     try {
       setLoading(true);
       setError("");
+      
+      // Fetch the patient profile
+      const response = await patientService.getPatientById(patientId);
+      setPatient(response.data); 
+      
+      // Fetch the patient's reports
+      const reportsResponse = await reportService.getReportsByPatient(patientId);
+      setReports(reportsResponse.data.data || []); 
 
-     const response =
-       await patientService.getPatientById(patientId);
-      setPatient(response.data);
-setReports([]);
     } catch (err) {
       console.error(err);
-
       setError(
         err.response?.data?.message ||
-          "حدث خطأ أثناء تحميل بيانات المستفيد"
+          "Failed to load patient data."
       );
     } finally {
       setLoading(false);
@@ -102,26 +105,10 @@ setReports([]);
       className="min-h-screen bg-[#FCFEFD] px-10 py-10"
     >
       <div className="mx-auto max-w-[1500px]">
-
+<BackButton />
         {/* Breadcrumb */}
 
-        <div className="mb-8 text-lg text-gray-400">
-
-          الرئيسية
-
-          <span className="mx-2 text-[#35C759]">
-            /
-          </span>
-
-          المستفيدين
-
-          <span className="mx-2 text-[#35C759]">
-            /
-          </span>
-
-          ملف المستفيد
-
-        </div>
+      
 
         {/* Header */}
 
@@ -721,7 +708,7 @@ setReports([]);
                   setIsReportModalOpen(false);
 
                   navigate(
-                    `/doctor/add-post-report/${patient._id}`
+                    `/doctor/reports/secondary/${patient._id}`
                   );
                 }}
                 className="

@@ -66,6 +66,14 @@ await report.populate([
 
     return report;
   }
+
+ async getByPatientId(patientId) {
+    const reports = await PreReport.find({ patient: patientId })
+      .populate({ path: "teamLeader", select: "firstName lastName" })
+      .sort({ createdAt: -1 }); // Newest first
+    return reports;
+  }
+  
   async getPendingReports(teamLeaderId) {
   const reports = await PreReport.find({
     teamLeader: teamLeaderId,
