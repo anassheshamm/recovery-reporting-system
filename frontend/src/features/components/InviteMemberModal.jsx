@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { X, Loader2 } from "lucide-react";
-import api from "../../services/api"; // Import your centralized API service
+import api from "../../services/api"; // Fixed path to your centralized API service
 
 const InviteMemberModal = ({ open, onClose, onSuccess }) => {
   const [email, setEmail] = useState("");
@@ -18,26 +18,28 @@ const InviteMemberModal = ({ open, onClose, onSuccess }) => {
       setSubmitting(true);
       setError("");
       
-      // Use the api instance which automatically attaches the token
-      // Point to the correct backend route: /invitations
+      // Sends the invitation to your backend
       const response = await api.post("/invitations", { email, role });
 
-      if (response.data.success || response.status === 200 || response.status === 201) {
+      if (response.data?.success || response.status === 200 || response.status === 201) {
+        // Success! Reset form and close
         setEmail("");
         setRole("");
+        
         if (onSuccess) onSuccess();
         onClose();
+        
+        // Optional: Show a success alert to the Admin
+        alert("تم إرسال الدعوة بنجاح!");
       }
     } catch (err) {
       setError(
-        err.response?.data?.message || "An error occurred while sending the invitation."
+        err.response?.data?.message || "حدث خطأ أثناء إرسال الدعوة. تأكد من صحة البريد الإلكتروني."
       );
     } finally {
       setSubmitting(false);
     }
   };
-
-  // ... rest of your component remains the same
 
   const handleClose = () => {
     if (submitting) return;
@@ -55,17 +57,16 @@ const InviteMemberModal = ({ open, onClose, onSuccess }) => {
       <div className="w-full max-w-md rounded-3xl bg-white shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5">
-          <button
-            onClick={handleClose}
-            disabled={submitting}
-            className="rounded-lg p-2 transition hover:bg-gray-100 disabled:opacity-50"
-          >
-            <X size={20} />
-          </button>
-
           <h2 className="text-2xl font-bold text-[#1F2937]">
             دعوة عضو جديد
           </h2>
+          <button
+            onClick={handleClose}
+            disabled={submitting}
+            className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6 p-6">
@@ -83,6 +84,7 @@ const InviteMemberModal = ({ open, onClose, onSuccess }) => {
 
             <input
               type="email"
+              required
               placeholder="example@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -97,9 +99,9 @@ const InviteMemberModal = ({ open, onClose, onSuccess }) => {
                 text-right
                 outline-none
                 transition
-                focus:border-[#247C5A]
+                focus:border-[#35C759]
                 focus:ring-2
-                focus:ring-[#247C5A]/10
+                focus:ring-[#35C759]/10
                 disabled:bg-gray-100
               "
             />
@@ -112,6 +114,7 @@ const InviteMemberModal = ({ open, onClose, onSuccess }) => {
             </label>
 
             <select
+              required
               value={role}
               onChange={(e) => setRole(e.target.value)}
               disabled={submitting}
@@ -126,16 +129,17 @@ const InviteMemberModal = ({ open, onClose, onSuccess }) => {
                 text-right
                 outline-none
                 transition
-                focus:border-[#247C5A]
+                focus:border-[#35C759]
                 focus:ring-2
-                focus:ring-[#247C5A]/10
+                focus:ring-[#35C759]/10
                 disabled:bg-gray-100
               "
             >
               <option value="">اختر نوع الحساب</option>
-              <option value="doctor">معالج</option>
-              <option value="head_of_department">رئيس قسم</option>
-              <option value="admin">مدير</option>
+              <option value="doctor">مرشد تعافي / معالج</option>
+              {/* FIXED: Changed from "head_of_department" to "teamLeader" */}
+              <option value="teamLeader">رئيس فريق</option> 
+              <option value="admin">مسؤول نظام (مدير)</option>
             </select>
           </div>
 
@@ -151,7 +155,8 @@ const InviteMemberModal = ({ open, onClose, onSuccess }) => {
                 border
                 border-gray-300
                 py-3
-                font-medium
+                font-bold
+                text-gray-600
                 transition
                 hover:bg-gray-100
                 disabled:opacity-50
@@ -172,12 +177,13 @@ const InviteMemberModal = ({ open, onClose, onSuccess }) => {
                 rounded-xl
                 bg-[#35C759]
                 py-3
-                font-medium
+                font-bold
                 text-white
+                shadow-sm
                 transition
                 hover:bg-[#2FB350]
                 disabled:cursor-not-allowed
-                disabled:bg-gray-300
+                disabled:opacity-70
               "
             >
               {submitting ? (

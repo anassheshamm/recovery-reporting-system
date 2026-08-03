@@ -50,9 +50,9 @@ const HeadsTable = ({ heads = [] }) => {
               </td>
             </tr>
           ) : (
-            heads.map((head) => (
+            heads.map((head, index) => (
               <HeadRow
-                key={head.id}
+                key={head._id || index}
                 head={head}
               />
             ))

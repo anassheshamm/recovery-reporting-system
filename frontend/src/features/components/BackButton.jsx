@@ -1,12 +1,31 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
 const BackButton = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // 1. List all the "Main" pages where the back button SHOULD NOT appear
+  const hideOnPages = [
+    "/",
+    "/admin",
+    "/admin/doctors",
+    "/admin/patients",
+    "/admin/heads",
+    "/doctor",
+    "/team-leader",
+    "/team-leader/doctors",
+    "/team-leader/patients",
+  ];
+
+  // 2. If the current URL is in the list above, don't render anything!
+  if (hideOnPages.includes(location.pathname)) {
+    return null;
+  }
+
+  // 3. Otherwise, show the button
   return (
-    // The "flex justify-end" wrapper pushes the button to the left in RTL
-    <div className="mb-6 flex justify-end print:hidden">
+    <div className="mb-6 flex justify-start print:hidden">
       <button
         onClick={() => navigate(-1)}
         type="button"

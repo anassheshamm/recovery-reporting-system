@@ -5,7 +5,11 @@ const userService = {
     return api.get("/users/team-leaders");
   },
   getMyTeam() {
-    return api.get("/users/my-team"); // NEW
+    return api.get("/users/my-team");
+  },
+  // ==== ADD THIS NEW METHOD ====
+  createUser(data) {
+    return api.post("/users", data);
   }
 };
 
