@@ -4,27 +4,23 @@ import AppError from "../../shared/errors/AppError.js";
 
 class UserService {
   async create(data) {
-    // Check if email already exists
     const existingUser = await User.findOne({ email: data.email });
     if (existingUser) {
       throw new AppError("Email already exists.", 400);
     }
-    
-    // Check if national ID already exists
+         
     const existingNationalId = await User.findOne({ nationalId: data.nationalId });
     if (existingNationalId) {
       throw new AppError("National ID already exists.", 409);
     }
 
-    // Hash the password before saving
     const hashedPassword = await bcrypt.hash(data.password, 10);
     data.password = hashedPassword;
-
+    
     const user = await User.create(data);
     const userObject = user.toObject();
-    delete userObject.password; // Remove password from the returned object
-
-    
+    delete userObject.password; 
+         
     return userObject;
   }
 
@@ -39,19 +35,30 @@ class UserService {
   }
 
   async getTeamLeaders() {
-  return await User.find({
-    role: "teamLeader",
-    isActive: true,
-  })
-    .select(
-      "firstName middleName lastName email"
-    )
-    .sort({
-      firstName: 1,
-    });
-}
+    return await User.find({
+      role: "teamLeader",
+      isActive: true,
+    })
+      .select("firstName middleName lastName email")
+      .sort({ firstName: 1 });
+  }
 
-  async getAll(filters = {}) {}
+  async getAll(filters = {}) {
+    return await User.find(filters)
+      .select("-password")
+      .sort({ createdAt: -1 });
+  }
+
+  // NEW METHOD: Get doctors assigned to a specific team leader
+  async getMyTeam(teamLeaderId) {
+    return await User.find({
+      role: "doctor",
+      teamLeader: teamLeaderId,
+      isActive: true,
+    })
+      .select("-password")
+      .sort({ createdAt: -1 });
+  }
 
   async deactivate(id) {}
 }

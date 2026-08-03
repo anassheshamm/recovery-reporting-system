@@ -2,11 +2,26 @@ import api from "./api";
 
 const patientService = {
   // ===========================
-  // Get All Patients
+  // Get All Patients (Original)
   // ===========================
   async getAllPatients() {
     const response = await api.get("/patients");
     return response.data;
+  },
+
+  // ===========================
+  // Get Patients (Used by Team Leader / Dashboard)
+  // ===========================
+  getPatients(search = "") {
+    const queryString = search ? `?search=${search}` : "";
+    return api.get(`/patients${queryString}`);
+  },
+
+  // ===========================
+  // Get Dashboard Stats
+  // ===========================
+  getDashboardStats() {
+    return api.get("/patients/dashboard");
   },
 
   // ===========================
@@ -25,41 +40,23 @@ const patientService = {
       firstName: form.firstName,
       middleName: form.middleName,
       lastName: form.lastName,
-
       nationalId: form.nationalId,
-
       gender: form.gender,
-
       nationality: form.nationality,
-
       occupation: form.occupation,
-
       maritalStatus: form.maritalStatus,
-
       dateOfBirth: form.dateOfBirth,
-
       phone: form.phone,
-
       alternativePhone: form.alternativePhone,
-
-      emergencyContactPhone:
-        form.emergencyContactPhone,
-
-      emergencyContactRelation:
-        form.emergencyContactRelation,
-
+      emergencyContactPhone: form.emergencyContactPhone,
+      emergencyContactRelation: form.emergencyContactRelation,
       email: form.email,
-
       address: form.address,
     };
 
     console.log("Patient Payload:", payload);
 
-    const response = await api.post(
-      "/patients",
-      payload
-    );
-
+    const response = await api.post("/patients", payload);
     return response.data;
   },
 
@@ -71,39 +68,21 @@ const patientService = {
       firstName: form.firstName,
       middleName: form.middleName,
       lastName: form.lastName,
-
       nationalId: form.nationalId,
-
       gender: form.gender,
-
       nationality: form.nationality,
-
       occupation: form.occupation,
-
       maritalStatus: form.maritalStatus,
-
       dateOfBirth: form.dateOfBirth,
-
       phone: form.phone,
-
       alternativePhone: form.alternativePhone,
-
-      emergencyContactPhone:
-        form.emergencyContactPhone,
-
-      emergencyContactRelation:
-        form.emergencyContactRelation,
-
+      emergencyContactPhone: form.emergencyContactPhone,
+      emergencyContactRelation: form.emergencyContactRelation,
       email: form.email,
-
       address: form.address,
     };
 
-    const response = await api.put(
-      `/patients/${id}`,
-      payload
-    );
-
+    const response = await api.put(`/patients/${id}`, payload);
     return response.data;
   },
 
@@ -111,10 +90,7 @@ const patientService = {
   // Delete Patient
   // ===========================
   async deletePatient(id) {
-    const response = await api.delete(
-      `/patients/${id}`
-    );
-
+    const response = await api.delete(`/patients/${id}`);
     return response.data;
   },
 };

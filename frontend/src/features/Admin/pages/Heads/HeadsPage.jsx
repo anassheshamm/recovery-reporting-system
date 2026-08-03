@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import HeadsHeader from "./HeadsHeader";
 import HeadsTable from "./HeadsTable";
-import api from "../../../../services/api"; // Import centralized API
+import api from "../../../../services/api";
 
 const HeadsPage = () => {
   const [heads, setHeads] = useState([]);
@@ -12,22 +12,19 @@ const HeadsPage = () => {
     const fetchHeads = async () => {
       try {
         setLoading(true);
+        setError("");
         
-        // Use api instance
+        // Fetch users and filter by the 'teamLeader' role to match backend
         const response = await api.get("/users", {
-          params: { role: "head" } 
+          params: { role: "teamLeader" } 
         });
 
         if (response.data.success) {
-          const allUsers = response.data.data || [];
-          const headsList = allUsers.filter(
-            (u) => u.role === "head" || u.role === "teamLeader" // Adjusted backend role name
-          );
-          setHeads(headsList.length ? headsList : allUsers);
+          setHeads(response.data.data || []);
         }
       } catch (err) {
         setError(
-          err.response?.data?.message || "Failed to load heads of department."
+          err.response?.data?.message || "فشل في تحميل قائمة رؤساء الفرق."
         );
       } finally {
         setLoading(false);
@@ -37,12 +34,10 @@ const HeadsPage = () => {
     fetchHeads();
   }, []);
 
-  // ... rest of your component remains the same
-
   const handleDownload = () => {
     if (!heads.length) return;
 
-    const headers = ["الاسم", "رقم الهوية", "الهاتف", "البريد الإلكتروني"];
+    const headers = ["الاسم", "رقم الهوية", "رقم الهاتف", "البريد الإلكتروني"];
     const rows = heads.map((h) => [
       `${h.firstName || ""} ${h.lastName || ""}`.trim(),
       h.nationalId || "",
@@ -57,7 +52,7 @@ const HeadsPage = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "heads_list.csv");
+    link.setAttribute("download", "team_leaders_list.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

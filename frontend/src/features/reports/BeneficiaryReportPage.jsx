@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
+import userService from "../../services/user.service";
 import patientService from "../../services/patient.service";
 import reportService from "../../services/report.service";
 
@@ -12,7 +12,8 @@ const BeneficiaryReportPage = () => {
   const [saving, setSaving] = useState(false);
 
   const [patient, setPatient] = useState(null);
-
+  const [teamLeaders, setTeamLeaders] = useState([]);
+  
   const [formData, setFormData] = useState({
     teamLeader: "",
 
@@ -48,16 +49,23 @@ const BeneficiaryReportPage = () => {
 
   useEffect(() => {
     loadPatient();
+    
+    // Fetch Team Leaders for the dropdown
+    userService.getTeamLeaders()
+      .then((res) => setTeamLeaders(res.data?.data || []))
+      .catch((err) => console.error("Failed to load team leaders", err));
   }, [patientId]);
 
   const loadPatient = async () => {
     try {
       setLoading(true);
       
-      // Update this line from getPatient to getPatientById
       const response = await patientService.getPatientById(patientId);
       
-      setPatient(response.data?.data?.patient || response.data);
+      // FIX: Correctly extract the patient object from the nested backend payload
+      const actualPatient = response?.data?.patient || response?.patient || response;
+      
+      setPatient(actualPatient);
     } catch (error) {
       console.error(error);
       alert("Failed to load patient.");
@@ -224,12 +232,6 @@ const BeneficiaryReportPage = () => {
               className="h-16 object-contain"
             />
 
-            {/* <img
-              src="/logo3.png"
-              alt="Logo"
-              className="h-16 object-contain"
-            /> */}
-
           </div>
 
           <div className="my-6 h-[2px] w-full bg-gradient-to-r from-transparent via-[#34C759] to-transparent" />
@@ -344,23 +346,25 @@ const BeneficiaryReportPage = () => {
 
                 </div>
 
-                {/* Temporary Team Leader */}
-
+                {/* Team Leader Dropdown */}
                 <div className="flex flex-col gap-3 md:col-span-2">
-
                   <label className="font-semibold text-[#1E7A5A]">
-                    Team Leader ID
+                    رئيس الفريق (للاعتماد)
                   </label>
-
-                  <input
-                    type="text"
+                  <select
                     name="teamLeader"
                     value={formData.teamLeader}
                     onChange={handleInputChange}
-                    placeholder="Temporary until Team Leader dropdown is implemented"
+                    required
                     className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
-                  />
-
+                  >
+                    <option value="">اختر رئيس الفريق...</option>
+                    {teamLeaders.map((tl) => (
+                      <option key={tl._id} value={tl._id}>
+                        {tl.firstName} {tl.lastName}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
               </div>
@@ -670,7 +674,7 @@ const BeneficiaryReportPage = () => {
 
                   <label
                     key={option.value}
-                    className="mb-4 flex cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] px-4 py-3 transition hover:border-[#34C759] hover:bg-[#F5FCF7]"
+                    className="mb-4 flex cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] px-4 py-3 transition hover:border-[#34C759] hover:border-[#34C759] hover:bg-[#F5FCF7]"
                   >
 
                     <input

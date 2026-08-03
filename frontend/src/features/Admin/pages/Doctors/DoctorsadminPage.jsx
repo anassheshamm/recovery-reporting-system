@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import PageHeader from "../../../components/PageHeader";
 import DoctorsTable from "./DoctorsTable";
-import api from "../../../../services/api"; // Import centralized API
+import api from "../../../../services/api";
 
 const DoctorsadminPage = () => {
   const [doctors, setDoctors] = useState([]);
@@ -12,10 +12,11 @@ const DoctorsadminPage = () => {
     const fetchDoctors = async () => {
       try {
         setLoading(true);
+        setError("");
         
-        // Use api instance and point to /users with role filter
+        // Fetch users and filter by the 'doctor' role
         const response = await api.get("/users", {
-          params: { role: "doctor" } 
+          params: { role: "doctor" }
         });
 
         if (response.data.success) {
@@ -23,7 +24,7 @@ const DoctorsadminPage = () => {
         }
       } catch (err) {
         setError(
-          err.response?.data?.message || "Failed to load doctors."
+          err.response?.data?.message || "فشل في تحميل قائمة الأطباء."
         );
       } finally {
         setLoading(false);
@@ -33,14 +34,12 @@ const DoctorsadminPage = () => {
     fetchDoctors();
   }, []);
 
-  // ... rest of your component remains the same
-
   return (
     <div dir="rtl" className="mx-auto max-w-[1300px]">
       <PageHeader
-        title="لائحة المعالجين"
-        description="عرض وإدارة جميع ملفات المعالجين الخاصة بالمركز"
-        downloadText="تنزيل لائحة المعالجين"
+        title="إدارة الأطباء"
+        description="عرض وإدارة حسابات الأطباء ومرشدي التعافي"
+        downloadText="تصدير القائمة"
       />
 
       {loading ? (

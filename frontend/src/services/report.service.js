@@ -1,30 +1,35 @@
 import api from "./api";
 
 class ReportService {
+  // Pre-Reports
   createPreReport(data) {
     return api.post("/pre-reports", data);
   }
-
-  getPendingReports() {
-    return api.get("/pre-reports/pending");
-  }
-
   getPreReport(id) {
     return api.get(`/pre-reports/${id}`);
   }
-
-  approveReport(id) {
-    return api.patch(`/pre-reports/${id}/approve`);
-  }
-
-  rejectReport(id, reason) {
-    return api.patch(`/pre-reports/${id}/reject`, {
-      reason,
-    });
-  }
-
   getReportsByPatient(patientId) {
     return api.get(`/pre-reports/patient/${patientId}`);
+  }
+  getPendingPreReports() {
+    return api.get("/pre-reports/pending");
+  }
+  approvePreReport(id) {
+    return api.patch(`/pre-reports/${id}/approve`);
+  }
+  rejectPreReport(id, reason) {
+    return api.patch(`/pre-reports/${id}/reject`, { reason });
+  }
+
+  // Post-Reports
+  getPendingPostReports() {
+    return api.get("/post-reports/pending");
+  }
+  approvePostReport(id) {
+    return api.patch(`/post-reports/${id}/approve`);
+  }
+  rejectPostReport(id, reason) {
+    return api.patch(`/post-reports/${id}/reject`, { reason });
   }
 }
 

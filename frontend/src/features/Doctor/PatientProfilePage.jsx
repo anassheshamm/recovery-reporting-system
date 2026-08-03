@@ -16,7 +16,6 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import patientService from "../../services/patient.service";
-import reportService from "../../services/report.service";
 
 const PatientProfilePage = () => {
   const navigate = useNavigate();
@@ -26,28 +25,52 @@ const PatientProfilePage = () => {
   const [error, setError] = useState("");
 
   const [patient, setPatient] = useState(null);
-  const [reports, setReports] = useState([]);
+  
+  // Unified state for both pre and post reports
+  const [allReports, setAllReports] = useState([]);
 
-  const [isReportModalOpen, setIsReportModalOpen] =
-    useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   useEffect(() => {
     loadPatient();
   }, [patientId]);
-
- const loadPatient = async () => {
+  
+  const loadPatient = async () => {
     try {
       setLoading(true);
       setError("");
 
-     const response =
-       await patientService.getPatientById(patientId);
-       console.log(response);
-console.log(response.data);
-console.log(response.data.patient);
-console.log(response.data.reports);
-setPatient(response.data.patient);
-setReports(response.data.reports);
+      // Fetch from the new updated backend endpoint
+      const response = await patientService.getPatientById(patientId);
+      
+      // Extract the new 3-part data structure from the response
+      const { patient, preReports, postReports } = response.data;
+      
+      setPatient(patient); 
+
+      // Format Pre-Reports
+      const formattedPreReports = (preReports || []).map(r => ({
+        ...r,
+        reportType: "قبلي", // Pre
+        programName: r.reportInformation?.programName,
+        viewLink: `/doctor/pre-reports/${r._id}`
+      }));
+
+      // Format Post-Reports
+      const formattedPostReports = (postReports || []).map(r => ({
+        ...r,
+        reportType: "بعدي", // Post
+        programName: r.beneficiaryInformation?.programName,
+        viewLink: `/doctor/post-reports/${r._id}`
+      }));
+
+      // Combine both arrays and sort chronologically (newest first)
+      const combined = [...formattedPreReports, ...formattedPostReports].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      setAllReports(combined);
+
     } catch (err) {
       console.error(err);
       setError(
@@ -64,6 +87,8 @@ setReports(response.data.reports);
       "حذف المستفيد غير متوفر حالياً لأن الـ Backend لا يحتوي على Delete Patient API."
     );
   };
+
+
 
   if (loading) {
     return (
@@ -456,186 +481,100 @@ setReports(response.data.reports);
 
         </section>
 
-        {/* ====================== */}
+       {/* ====================== */}
         {/* Reports */}
         {/* ====================== */}
-
         <section className="mb-20">
-
           <div className="mb-8 flex items-center justify-between">
-
             <div className="flex items-center gap-3">
-
               <div className="rounded-xl bg-[#EAF8F1] p-3">
                 <FileText
                   size={24}
                   className="text-[#247C5A]"
                 />
               </div>
-
               <div>
-
-                <h2 className="text-3xl font-bold">
-                  التقارير
-                </h2>
-
-                <p className="mt-1 text-gray-500">
-                  جميع تقارير المستفيد
-                </p>
-
+                <h2 className="text-3xl font-bold">التقارير السابقة</h2>
+                <p className="mt-1 text-gray-500">سجل التقارير القبلية والبعدية</p>
               </div>
-
             </div>
-
             <button
-              onClick={() =>
-                setIsReportModalOpen(true)
-              }
+              onClick={() => setIsReportModalOpen(true)}
               className="flex items-center gap-2 rounded-xl bg-[#35C759] px-6 py-3 font-semibold text-white transition hover:bg-[#2FB350]"
             >
-              <Plus size={18} />
-              إضافة تقرير
+              <Plus size={18} /> إضافة تقرير
             </button>
-
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-
             <table className="w-full">
-
               <thead className="bg-[#F8FAFC]">
-
                 <tr className="text-right">
-
-                  <th className="px-8 py-5">
-                    اسم البرنامج
-                  </th>
-
-                  <th className="px-8 py-5">
-                    قائد الفريق
-                  </th>
-
-                  <th className="px-8 py-5">
-                    الحالة
-                  </th>
-
-                  <th className="px-8 py-5">
-                    تاريخ الإنشاء
-                  </th>
-
-                  <th className="px-8 py-5 text-center">
-                    الإجراءات
-                  </th>
-
+                  <th className="px-8 py-5">نوع التقرير</th>
+                  <th className="px-8 py-5">اسم البرنامج</th>
+                  <th className="px-8 py-5">رئيس الفريق</th>
+                  <th className="px-8 py-5">الحالة</th>
+                  <th className="px-8 py-5">التاريخ</th>
+                  <th className="px-8 py-5 text-center">إجراءات</th>
                 </tr>
-
               </thead>
-
               <tbody>
-
-                {reports.length > 0 ? (
-
-                  reports.map((report) => (
-
-                    <tr
-                      key={report._id}
-                      className="border-t"
-                    >
-
-                      <td className="px-8 py-6">
-                        {
-                          report.reportInformation
-                            ?.programName
-                        }
+                {allReports.length > 0 ? (
+                  allReports.map((report) => (
+                    <tr key={report._id} className="border-t">
+                      <td className="px-8 py-6 font-bold text-[#1E7A5A]">
+                        {report.reportType}
                       </td>
-
+                      <td className="px-8 py-6">
+                        {report.programName || "-"}
+                      </td>
                       <td className="px-8 py-6">
                         {report.teamLeader
                           ? `${report.teamLeader.firstName} ${report.teamLeader.lastName}`
                           : "-"}
                       </td>
-
                       <td className="px-8 py-6">
-
                         <span
                           className={`rounded-full px-3 py-1 text-sm font-semibold ${
-                            report.approval
-                              ?.status === "approved"
+                            report.approval?.status === "approved"
                               ? "bg-green-100 text-green-700"
-                              : report.approval
-                                  ?.status ===
-                                "rejected"
+                              : report.approval?.status === "rejected"
                               ? "bg-red-100 text-red-700"
                               : "bg-yellow-100 text-yellow-700"
                           }`}
                         >
-                          {report.approval
-                            ?.status === "approved"
-                            ? "تمت الموافقة"
-                            : report.approval
-                                ?.status ===
-                              "rejected"
+                          {report.approval?.status === "approved"
+                            ? "معتمد"
+                            : report.approval?.status === "rejected"
                             ? "مرفوض"
-                            : "قيد المراجعة"}
+                            : "قيد الانتظار"}
                         </span>
-
                       </td>
-
                       <td className="px-8 py-6">
-                        {new Date(
-                          report.createdAt
-                        ).toLocaleDateString(
-                          "en-CA"
-                        )}
+                        {new Date(report.createdAt).toLocaleDateString("en-CA")}
                       </td>
-
                       <td className="px-8 py-6">
-
                         <div className="flex justify-center">
-
                           <button
-                            onClick={() =>
-                              navigate(
-                                `/doctor/pre-reports/${report._id}`
-                              )
-                            }
+                            onClick={() => navigate(report.viewLink)}
                             className="rounded-lg bg-[#EDF8F2] p-2 transition hover:bg-[#DDF4E5]"
                           >
-                            <Eye
-                              size={18}
-                              className="text-[#247C5A]"
-                            />
+                            <Eye size={18} className="text-[#247C5A]" />
                           </button>
-
                         </div>
-
                       </td>
-
                     </tr>
-
                   ))
-
                 ) : (
-
                   <tr>
-
-                    <td
-                      colSpan={5}
-                      className="py-16 text-center text-gray-400"
-                    >
-                      لا توجد تقارير لهذا المستفيد
+                    <td colSpan={6} className="py-16 text-center text-gray-400">
+                      لا توجد تقارير سابقة لهذا المستفيد
                     </td>
-
                   </tr>
-
                 )}
-
               </tbody>
-
             </table>
-
           </div>
-
         </section>
               {/* ====================== */}
       {/* Report Type Modal */}
