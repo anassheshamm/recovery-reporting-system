@@ -52,7 +52,7 @@ async getAll(req, res, next) {
   try {
     const data = await patientService.getById(
       req.params.id,
-      req.user._id
+      req.user
     );
 
     return res.status(200).json({

@@ -1,7 +1,7 @@
 import Patient from "./patient.model.js";
 import AppError from "../../shared/errors/AppError.js";
 import PreReport from "../preReport/preReport.model.js";
-
+import PostReport from "../postReport/postReport.model.js";
 
 class PatientService {
   async create(data) {
@@ -93,24 +93,39 @@ class PatientService {
     throw new AppError("Patient not found.", 404);
   }
 
-  const reports = await PreReport.find({
-    patient: patientId,
+const preReports = await PreReport.find({
+  patient: patientId,
+})
+  .select(
+    "reportInformation approval createdAt teamLeader"
+  )
+  .populate({
+    path: "teamLeader",
+    select: "firstName middleName lastName",
   })
-    .select(
-      "reportInformation approval createdAt teamLeader"
-    )
-    .populate({
-      path: "teamLeader",
-      select: "firstName middleName lastName",
-    })
-    .sort({
-      createdAt: -1,
-    });
+  .sort({
+    createdAt: -1,
+  });
 
-  return {
-    patient,
-    reports,
-  };
+const postReports = await PostReport.find({
+  patient: patientId,
+})
+  .select(
+    "beneficiaryInformation approval createdAt teamLeader"
+  )
+  .populate({
+    path: "teamLeader",
+    select: "firstName middleName lastName",
+  })
+  .sort({
+    createdAt: -1,
+  });
+
+return {
+  patient,
+  preReports,
+  postReports,
+};
 }
 
 async getDashboardStats(doctorId) {
@@ -123,21 +138,32 @@ const reports = await PreReport.find({
 console.log(reports);
   const [
     totalPatients,
-    totalReports,
-    pendingReports,
+  totalPreReports,
+  totalPostReports,
+  pendingPreReports,
+  pendingPostReports,
   ] = await Promise.all([
     Patient.countDocuments({
-      doctor: doctorId,
-    }),
+  doctor: doctorId,
+}),
 
-    PreReport.countDocuments({
-      doctor: doctorId,
-    }),
+PreReport.countDocuments({
+  doctor: doctorId,
+}),
 
-    PreReport.countDocuments({
-      doctor: doctorId,
-      "approval.status": "pending",
-    }),
+PostReport.countDocuments({
+  doctor: doctorId,
+}),
+
+PreReport.countDocuments({
+  doctor: doctorId,
+  "approval.status": "pending",
+}),
+
+PostReport.countDocuments({
+  doctor: doctorId,
+  "approval.status": "pending",
+}),
   ]);
 
   return {

@@ -14,6 +14,21 @@ class UserController {
       next(error);
     }
   }
+
+  async getTeamLeaders(req, res, next) {
+  try {
+    const teamLeaders =
+      await userService.getTeamLeaders();
+
+    return res.status(200).json({
+      success: true,
+      data: teamLeaders,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 }
 
 export default new UserController();
