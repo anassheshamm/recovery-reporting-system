@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import AuthLayout from "../layouts/AuthLayout";
 
@@ -25,51 +25,39 @@ import TeamLeaderLayout from "../features/TeamLeader/TeamLeaderLayout";
 import PendingReportsPage from "../features/TeamLeader/PendingReportsPage";
 import TeamDoctorsPage from "../features/TeamLeader/TeamDoctorsPage";
 import TeamPatientsPage from "../features/TeamLeader/TeamPatientsPage";
- 
 
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
-
 
 import Footer from "../components/Footer";
 
 export default function AppRouter() {
   return (
-    <Routes>
-      {/* ================= Authentication ================= */}
-<Route
-          path="*"
-          element={
-            <PublicRoute>
-          <LoginPage />
-            </PublicRoute>}
-        />
-      <Route element={<AuthLayout />}>
-        <Route
-          path="/register"
-          element={<Register />}
-        />
-
-        
-
-        <Route
-          path="/forgot-password"
-          element={<ForgotPasswordPage />}
-        />
-
-        <Route
-          path="/reset-password/:token"
-          element={<ResetPasswordPage />}
-        />
-      </Route>
     // Wrap the entire app in a min-h-screen flex column layout
     <div className="flex min-h-screen flex-col bg-[#FCFEFD]">
       
       {/* This flex-1 container holds the main content and pushes the footer down */}
       <div className="flex flex-1 flex-col">
         <Routes>
+          
           {/* ================= Authentication ================= */}
-          <Route path="*" element={<LoginPage />} />
+          <Route
+            path="/"
+            element={
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
+            }
+          />
+
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
+            }
+          />
           
           <Route element={<AuthLayout />}>
             <Route path="/register" element={<Register />} />
@@ -77,147 +65,99 @@ export default function AppRouter() {
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
           </Route>
 
-      {/* ================= Admin ================= */}
-
-      <Route
-  path="/admin"
-  element={
-    <ProtectedRoute roles={["admin"]}>
-      <AdminLayout />
-    </ProtectedRoute>
-  }
->
-        <Route
-          path="doctors"
-          element={<DoctorsadminPage />}
-        />
-
-        <Route
-          path="patients"
-          element={<PatientsPage />}
-        />
-
-        <Route
-          path="heads"
-          element={<HeadsPage />}
-        />
-      </Route>
           {/* ================= Admin ================= */}
-          <Route path="/admin" element={<AdminLayout />}>
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            {/* Redirects /admin to /admin/doctors by default */}
+            <Route index element={<Navigate to="doctors" replace />} />
             <Route path="doctors" element={<DoctorsadminPage />} />
             <Route path="patients" element={<PatientsPage />} />
             <Route path="heads" element={<HeadsPage />} />
           </Route>
 
-      {/* ================= Doctor ================= */}
-
-      <Route
-  path="/doctor"
-  element={
-    <ProtectedRoute roles={["doctor"]}>
-      <DoctorLayout />
-    </ProtectedRoute>
-  }
-/>
-        {/* Dashboard */}
-
-        <Route
-          index
-          element={<DoctorsPage />}
-        />
           {/* ================= Doctor ================= */}
-          <Route path="/doctor" element={<DoctorLayout />}>
-            {/* Dashboard */}
+          <Route
+            path="/doctor"
+            element={
+              <ProtectedRoute roles={["doctor"]}>
+                <DoctorLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route index element={<DoctorsPage />} />
-
-            {/* Create Patient */}
             <Route path="new" element={<CreatePatientPage />} />
-
-            {/* Patient Profile */}
             <Route path="patient/:patientId" element={<PatientProfilePage />} />
-
-            {/* Beneficiary Report */}
             <Route path="reports/beneficiary/:patientId" element={<BeneficiaryReportPage />} />
-
-            {/* Secondary Report */}
             <Route path="reports/secondary/:patientId" element={<PostReportPage />} />
           </Route>
 
-      <Route
-  path="/doctor/pre-reports/:reportId"
-  element={
-    <ProtectedRoute roles={["doctor"]}>
-      <ReportPreviewPage />
-    </ProtectedRoute>
-  }
-/>
-      <Route
-  path="/doctor/post-reports/:reportId"
-  element={
-    <ProtectedRoute roles={["doctor"]}>
-      <PostReport />
-    </ProtectedRoute>
-  }
-/>
-          <Route path="/doctor/pre-reports/:reportId" element={<ReportPreviewPage />} />
-          <Route path="/doctor/post-reports/:reportId" element={<PostReport />} />
+          {/* Doctor Previews (WITHOUT Sidebar) */}
+          <Route
+            path="/doctor/pre-reports/:reportId"
+            element={
+              <ProtectedRoute roles={["doctor"]}>
+                <ReportPreviewPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/doctor/post-reports/:reportId"
+            element={
+              <ProtectedRoute roles={["doctor"]}>
+                <PostReport />
+              </ProtectedRoute>
+            }
+          />
 
-     {/* ================= Team Leader (WITH Sidebar) ================= */}
-      <Route
-  path="/team-leader"
-  element={
-    <ProtectedRoute roles={["teamLeader"]}>
-      <TeamLeaderLayout />
-    </ProtectedRoute>
-  }
->
-        <Route index element={<PendingReportsPage />} />
-        
-        {/* New Team Leader Dashboard Routes */}
-        <Route path="doctors" element={<TeamDoctorsPage />} />
-        <Route path="patients" element={<TeamPatientsPage />} />
-        <Route path="patient/:patientId" element={<PatientProfilePage />} />
-      </Route>
           {/* ================= Team Leader (WITH Sidebar) ================= */}
-          <Route path="/team-leader" element={<TeamLeaderLayout />}>
+          <Route
+            path="/team-leader"
+            element={
+              <ProtectedRoute roles={["teamLeader"]}>
+                <TeamLeaderLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route index element={<PendingReportsPage />} />
-            
-            {/* New Team Leader Dashboard Routes */}
             <Route path="doctors" element={<TeamDoctorsPage />} />
             <Route path="patients" element={<TeamPatientsPage />} />
             <Route path="patient/:patientId" element={<PatientProfilePage />} />
           </Route>
 
           {/* ================= Team Leader (WITHOUT Sidebar - Previews) ================= */}
-          {/* Reusing the exact same preview components you built for the doctor! */}
-          <Route path="/team-leader/pre-reports/:reportId" element={<ReportPreviewPage />} />
-          <Route path="/team-leader/post-reports/:reportId" element={<PostReport />} />
+          <Route
+            path="/team-leader/pre-reports/:reportId"
+            element={
+              <ProtectedRoute roles={["teamLeader"]}>
+                <ReportPreviewPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/team-leader/post-reports/:reportId"
+            element={
+              <ProtectedRoute roles={["teamLeader"]}>
+                <PostReport />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ================= CATCH-ALL ROUTE ================= */}
+          {/* This MUST be the very last route in the file! */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+
         </Routes>
       </div>
 
       {/* ================= Global Footer ================= */}
-      {/* Placed outside the Routes so it renders globally at the bottom */}
       <Footer />
 
     </div>
-      {/* ================= Team Leader (WITHOUT Sidebar - Previews) ================= */}
-      {/* Reusing the exact same preview components you built for the doctor! */}
-      <Route
-  path="/team-leader/pre-reports/:reportId"
-  element={
-    <ProtectedRoute roles={["teamLeader"]}>
-      <ReportPreviewPage />
-    </ProtectedRoute>
-  }
-/>
-      <Route
-  path="/team-leader/post-reports/:reportId"
-  element={
-    <ProtectedRoute roles={["teamLeader"]}>
-      <PostReport />
-    </ProtectedRoute>
-  }
-/>
-    </Routes>
   );
 }
