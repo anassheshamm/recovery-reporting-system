@@ -9,5 +9,8 @@ const authService = {
     return api.post("/auth/register", data);
   },
 };
+  
+
+
 
 export default authService;

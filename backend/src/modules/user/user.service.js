@@ -38,6 +38,19 @@ class UserService {
     return await User.findById(id);
   }
 
+  async getTeamLeaders() {
+  return await User.find({
+    role: "teamLeader",
+    isActive: true,
+  })
+    .select(
+      "firstName middleName lastName email"
+    )
+    .sort({
+      firstName: 1,
+    });
+}
+
   async getAll(filters = {}) {}
 
   async deactivate(id) {}

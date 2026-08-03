@@ -16,4 +16,11 @@ router.post(
   userController.create
 );
 
+router.get(
+  "/team-leaders",
+  protect,
+  authorize("doctor", "admin"),
+  userController.getTeamLeaders
+);
+
 export default router;

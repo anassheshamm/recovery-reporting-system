@@ -1,5 +1,7 @@
 import Patient from "./patient.model.js";
 import AppError from "../../shared/errors/AppError.js";
+import PreReport from "../preReport/preReport.model.js";
+import PostReport from "../postReport/postReport.model.js";
 
 class PatientService {
   async create(data) {
@@ -21,12 +23,160 @@ class PatientService {
     );
   }
 
-  async getAll() {
-    return await Patient.find().populate(
+  async getAll(user, search) {
+  const query = {};
+
+  // Doctor can only see his patients
+  if (user.role === "doctor") {
+    query.doctor = user._id;
+  }
+
+  // Search by name or national ID
+  if (search) {
+    query.$or = [
+      {
+        firstName: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        middleName: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        lastName: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        nationalId: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+    ];
+  }
+
+  return await Patient.find(query)
+    .populate(
       "doctor",
       "firstName middleName lastName"
+    )
+    .sort({
+      createdAt: -1,
+    });
+}
+
+  async getById(patientId, user) {
+  let patient;
+
+  if (user.role === "doctor") {
+    patient = await Patient.findOne({
+      _id: patientId,
+      doctor: user._id,
+    }).populate(
+      "doctor",
+      "firstName middleName lastName email role"
+    );
+  } else {
+    patient = await Patient.findById(patientId).populate(
+      "doctor",
+      "firstName middleName lastName email role"
     );
   }
+
+  if (!patient) {
+    throw new AppError("Patient not found.", 404);
+  }
+
+const preReports = await PreReport.find({
+  patient: patientId,
+})
+  .select(
+    "reportInformation approval createdAt teamLeader"
+  )
+  .populate({
+    path: "teamLeader",
+    select: "firstName middleName lastName",
+  })
+  .sort({
+    createdAt: -1,
+  });
+
+const postReports = await PostReport.find({
+  patient: patientId,
+})
+  .select(
+    "beneficiaryInformation approval createdAt teamLeader"
+  )
+  .populate({
+    path: "teamLeader",
+    select: "firstName middleName lastName",
+  })
+  .sort({
+    createdAt: -1,
+  });
+
+return {
+  patient,
+  preReports,
+  postReports,
+};
+}
+
+async getDashboardStats(doctorId) {
+    console.log("Doctor ID:", doctorId);
+
+const reports = await PreReport.find({
+  doctor: doctorId,
+});
+
+console.log(reports);
+  const [
+    totalPatients,
+  totalPreReports,
+  totalPostReports,
+  pendingPreReports,
+  pendingPostReports,
+  ] = await Promise.all([
+    Patient.countDocuments({
+  doctor: doctorId,
+}),
+
+PreReport.countDocuments({
+  doctor: doctorId,
+}),
+
+PostReport.countDocuments({
+  doctor: doctorId,
+}),
+
+PreReport.countDocuments({
+  doctor: doctorId,
+  "approval.status": "pending",
+}),
+
+PostReport.countDocuments({
+  doctor: doctorId,
+  "approval.status": "pending",
+}),
+  ]);
+
+  return {
+    totalPatients,
+    totalReports,
+    pendingReports,
+  };
+}
+
+
+
+
+
 }
 
 export default new PatientService();

@@ -22,8 +22,13 @@ app.use(compression());
 /**
  * CORS
  */
-app.use(cors());
 
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 /**
  * Logging
  */

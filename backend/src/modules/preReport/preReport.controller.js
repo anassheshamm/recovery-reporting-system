@@ -79,6 +79,19 @@ async reject(req, res, next) {
   }
 }
 
+async getMyReports(req, res, next) {
+  try {
+    const reports = await preReportService.getMyReports(req.user._id);
+
+    return res.status(200).json({
+      success: true,
+      data: reports,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async getById(req, res, next) {
   try {
     const report = await preReportService.getById(

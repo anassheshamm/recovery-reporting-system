@@ -39,15 +39,15 @@ const PatientProfilePage = () => {
     try {
       setLoading(true);
       setError("");
-      
-      // Fetch the patient profile
-      const response = await patientService.getPatientById(patientId);
-      setPatient(response.data); 
-      
-      // Fetch the patient's reports
-      const reportsResponse = await reportService.getReportsByPatient(patientId);
-      setReports(reportsResponse.data.data || []); 
 
+     const response =
+       await patientService.getPatientById(patientId);
+       console.log(response);
+console.log(response.data);
+console.log(response.data.patient);
+console.log(response.data.reports);
+setPatient(response.data.patient);
+setReports(response.data.reports);
     } catch (err) {
       console.error(err);
       setError(

@@ -1,8 +1,11 @@
 import { Router } from "express";
 
-import preReportController from "./preReport.controller.js";
+import postReportController from "./postReport.controller.js";
 
-import { createPreReportValidation,rejectPreReportValidation} from "./preReport.validation.js";
+import {
+  createPostReportValidation,
+  rejectPostReportValidation,
+} from "./postReport.validation.js";
 
 import validate from "../../middlewares/validate.middleware.js";
 import protect from "../../middlewares/protect.middleware.js";
@@ -14,53 +17,50 @@ router.post(
   "/",
   protect,
   authorize("doctor"),
-  createPreReportValidation,
+  createPostReportValidation,
   validate,
-  preReportController.create
+  postReportController.create
 );
 
 router.get(
   "/my-reports",
   protect,
   authorize("doctor"),
-  preReportController.getMyReports
+  postReportController.getMyReports
 );
 
 router.get(
   "/pending",
   protect,
   authorize("teamLeader"),
-  preReportController.getPending
-);
-
-router.get(
-  "/patient/:patientId",
-  protect,
-  authorize("doctor", "teamLeader", "admin"),
-  preReportController.getByPatient
+  postReportController.getPending
 );
 
 router.get(
   "/:id",
   protect,
-  authorize("doctor", "teamLeader", "admin"),
-  preReportController.getById
+  authorize(
+    "doctor",
+    "teamLeader",
+    "admin"
+  ),
+  postReportController.getById
 );
 
 router.patch(
   "/:id/approve",
   protect,
   authorize("teamLeader"),
-  preReportController.approve
+  postReportController.approve
 );
 
 router.patch(
   "/:id/reject",
   protect,
   authorize("teamLeader"),
-  rejectPreReportValidation,
+  rejectPostReportValidation,
   validate,
-  preReportController.reject
+  postReportController.reject
 );
 
 export default router;
