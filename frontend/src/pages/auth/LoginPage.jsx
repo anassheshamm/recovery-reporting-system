@@ -10,6 +10,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 
 import logo from "/logo2.png";
+import logo2 from "/logo.png";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -51,20 +52,22 @@ const LoginPage = () => {
         password: form.password,
       });
 
+   // 1. Add this console log to see exactly what string your DB is sending back
+      console.log("User role from DB is:", user.role);
+
       switch (user.role) {
         case "admin":
-          navigate("/admin/dashboard");
+          navigate("/admin/heads");
           break;
-
         case "doctor":
           navigate("/doctor");
           break;
-
-        case "team_leader":
-          navigate("/team-leader/dashboard");
+        case "teamLeader":
+        case "team_leader": // 2. Add this fallback to catch older database entries!
+          navigate("/team-leader");
           break;
-
         default:
+          console.warn("Unrecognized role. Check your database!", user.role);
           navigate("/");
       }
     } catch (err) {
@@ -89,6 +92,11 @@ const LoginPage = () => {
         <div className="mb-10 flex justify-center">
           <img
             src={logo}
+            alt="Recovery"
+            className="w-40 object-contain"
+          />
+          <img
+            src={logo2}
             alt="Recovery"
             className="w-40 object-contain"
           />

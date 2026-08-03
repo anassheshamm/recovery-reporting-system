@@ -52,6 +52,11 @@ const loadStatistics = async () => {
             alt="Recovery"
             className="w-36 object-contain"
           />
+           <img
+            src="/logo.png"
+            alt="Recovery"
+            className="w-36 object-contain"
+          />
         </div>
 
         {/* Create Patient */}
@@ -79,17 +84,7 @@ const loadStatistics = async () => {
         </div>
 
         {/* Fill Report */}
-        <Link
-          to="/doctor/patients"
-          className="mb-10 flex h-12 w-full items-center justify-between rounded-xl border border-[#E5E7EB] bg-white px-4 transition hover:bg-[#F8FAF9]"
-        >
-          <Plus
-            size={18}
-            className="rounded-md border border-[#35C759] p-0.5 text-[#35C759]"
-          />
-          <span className="font-medium text-[#2F2F2F]">ملء تقرير جديد</span>
-          <FileText size={18} className="text-transparent" />
-        </Link>
+       
 
         {/* Statistics */}
         <div className="space-y-6">

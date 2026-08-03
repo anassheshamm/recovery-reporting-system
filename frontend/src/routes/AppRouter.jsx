@@ -17,6 +17,15 @@ import CreatePatientPage from "../features/Doctor/CreatePatientPage";
 import PatientProfilePage from "../features/Doctor/PatientProfilePage";
 import BeneficiaryReportPage from "../features/reports/BeneficiaryReportPage";
 import DoctorsPage from "../features/Doctor/Doctorpage";
+import ReportPreviewPage from "../features/reports/ReportPreviewPage";
+import PostReport from "../features/reports/postReportPreview";
+import PostReportPage from "../features/reports/PostReportPage";
+import TeamLeaderLayout from "../features/TeamLeader/TeamLeaderLayout";
+import PendingReportsPage from "../features/TeamLeader/PendingReportsPage";
+import TeamDoctorsPage from "../features/TeamLeader/TeamDoctorsPage";
+import TeamPatientsPage from "../features/TeamLeader/TeamPatientsPage";
+ 
+
 
 export default function AppRouter() {
   return (
@@ -100,7 +109,47 @@ export default function AppRouter() {
           path="reports/beneficiary/:patientId"
           element={<BeneficiaryReportPage />}
         />
+
+        {/* Secondary Report */}
+
+        <Route
+          path="reports/secondary/:patientId"
+          element={<PostReportPage />}
+        />
       </Route>
+
+      <Route
+        path="/doctor/pre-reports/:reportId"
+        element={<ReportPreviewPage />}
+      />
+      <Route
+        path="/doctor/post-reports/:reportId"
+        element={<PostReport />}
+      />
+
+     {/* ================= Team Leader (WITH Sidebar) ================= */}
+      <Route
+        path="/team-leader"
+        element={<TeamLeaderLayout />}
+      >
+        <Route index element={<PendingReportsPage />} />
+        
+        {/* New Team Leader Dashboard Routes */}
+        <Route path="doctors" element={<TeamDoctorsPage />} />
+        <Route path="patients" element={<TeamPatientsPage />} />
+        <Route path="patient/:patientId" element={<PatientProfilePage />} />
+      </Route>
+
+      {/* ================= Team Leader (WITHOUT Sidebar - Previews) ================= */}
+      {/* Reusing the exact same preview components you built for the doctor! */}
+      <Route
+        path="/team-leader/pre-reports/:reportId"
+        element={<ReportPreviewPage />}
+      />
+      <Route
+        path="/team-leader/post-reports/:reportId"
+        element={<PostReport />} 
+      />
     </Routes>
   );
 }
