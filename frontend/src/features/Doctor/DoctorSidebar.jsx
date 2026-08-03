@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
-import { Plus, Search, FileText } from "lucide-react";
+import { Plus, Search, FileText, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
+
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 import patientService from "../../services/patient.service";
 
@@ -13,6 +16,9 @@ const DoctorSidebar = ({ onSearchChange }) => {
     pendingReports: 0,
   });
 
+  const { logout } = useAuth();
+const navigate = useNavigate();
+
   useEffect(() => {
     loadStatistics();
   }, []);
@@ -24,6 +30,11 @@ const DoctorSidebar = ({ onSearchChange }) => {
       onSearchChange(val);
     }
   };
+
+  const handleLogout = () => {
+  logout();
+  navigate("/", { replace: true });
+};
 
 const loadStatistics = async () => {
   try {
@@ -101,6 +112,14 @@ const loadStatistics = async () => {
         </div>
 
         <div className="flex-1" />
+
+        <button
+  onClick={handleLogout}
+  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-red-200 text-red-600 transition hover:bg-red-50"
+>
+  <LogOut size={18} />
+  تسجيل الخروج
+</button>
       </div>
     </aside>
   );
