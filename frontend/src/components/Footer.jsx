@@ -14,22 +14,18 @@ const Footer = () => {
         {/* Logos (Top) */}
         <div className="flex items-center justify-center gap-8">
           <img 
-            src="/logo.png" 
+            src="/logo3.png" 
             alt="Logo" 
-            className="h-20 object-contain " 
+            className="h-24 object-contain " 
           />
-          <img 
-            src="/logo2.png" 
-            alt="Recovery Logo" 
-            className="h-20 object-contain " 
-          />
+         
         </div>
 
         {/* Copyright Text (Bottom) */}
         <div className="text-center text-sm font-semibold text-gray-400">
          
 
-  جميع الحقوق محفوظة لجمعية إرشاد لتأهيل وتوعية المتعافين من الإدمان © {currentYear}
+  جميع الحقوق محفوظة لشركة واثق المجد للاستشارات والتطوير والتأهيل © {currentYear}
         </div>
         
       </div>
