@@ -26,6 +26,9 @@ import TeamDoctorsPage from "../features/TeamLeader/TeamDoctorsPage";
 import TeamPatientsPage from "../features/TeamLeader/TeamPatientsPage";
  
 
+import ProtectedRoute from "./ProtectedRoute";
+import PublicRoute from "./PublicRoute";
+
 
 export default function AppRouter() {
   return (
@@ -33,7 +36,10 @@ export default function AppRouter() {
       {/* ================= Authentication ================= */}
 <Route
           path="*"
-          element={<LoginPage />}
+          element={
+            <PublicRoute>
+          <LoginPage />
+            </PublicRoute>}
         />
       <Route element={<AuthLayout />}>
         <Route
@@ -57,9 +63,13 @@ export default function AppRouter() {
       {/* ================= Admin ================= */}
 
       <Route
-        path="/admin"
-        element={<AdminLayout />}
-      >
+  path="/admin"
+  element={
+    <ProtectedRoute roles={["admin"]}>
+      <AdminLayout />
+    </ProtectedRoute>
+  }
+>
         <Route
           path="doctors"
           element={<DoctorsadminPage />}
@@ -79,9 +89,13 @@ export default function AppRouter() {
       {/* ================= Doctor ================= */}
 
       <Route
-        path="/doctor"
-        element={<DoctorLayout />}
-      >
+  path="/doctor"
+  element={
+    <ProtectedRoute roles={["doctor"]}>
+      <DoctorLayout />
+    </ProtectedRoute>
+  }
+>
         {/* Dashboard */}
 
         <Route
@@ -119,19 +133,31 @@ export default function AppRouter() {
       </Route>
 
       <Route
-        path="/doctor/pre-reports/:reportId"
-        element={<ReportPreviewPage />}
-      />
+  path="/doctor/pre-reports/:reportId"
+  element={
+    <ProtectedRoute roles={["doctor"]}>
+      <ReportPreviewPage />
+    </ProtectedRoute>
+  }
+/>
       <Route
-        path="/doctor/post-reports/:reportId"
-        element={<PostReport />}
-      />
+  path="/doctor/post-reports/:reportId"
+  element={
+    <ProtectedRoute roles={["doctor"]}>
+      <PostReport />
+    </ProtectedRoute>
+  }
+/>
 
      {/* ================= Team Leader (WITH Sidebar) ================= */}
       <Route
-        path="/team-leader"
-        element={<TeamLeaderLayout />}
-      >
+  path="/team-leader"
+  element={
+    <ProtectedRoute roles={["teamLeader"]}>
+      <TeamLeaderLayout />
+    </ProtectedRoute>
+  }
+>
         <Route index element={<PendingReportsPage />} />
         
         {/* New Team Leader Dashboard Routes */}
@@ -143,13 +169,21 @@ export default function AppRouter() {
       {/* ================= Team Leader (WITHOUT Sidebar - Previews) ================= */}
       {/* Reusing the exact same preview components you built for the doctor! */}
       <Route
-        path="/team-leader/pre-reports/:reportId"
-        element={<ReportPreviewPage />}
-      />
+  path="/team-leader/pre-reports/:reportId"
+  element={
+    <ProtectedRoute roles={["teamLeader"]}>
+      <ReportPreviewPage />
+    </ProtectedRoute>
+  }
+/>
       <Route
-        path="/team-leader/post-reports/:reportId"
-        element={<PostReport />} 
-      />
+  path="/team-leader/post-reports/:reportId"
+  element={
+    <ProtectedRoute roles={["teamLeader"]}>
+      <PostReport />
+    </ProtectedRoute>
+  }
+/>
     </Routes>
   );
 }
