@@ -15,10 +15,7 @@ const menu = [
     label: "المستفيدين",
     path: "/admin/patients",
   },
-  {
-    label: "التقارير",
-    path: "/admin/reports",
-  },
+  
 ];
 
 const AdminLayout = () => {

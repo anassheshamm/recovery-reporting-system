@@ -1,20 +1,24 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Loader2, Printer } from "lucide-react";
+import { ArrowRight, Loader2, Printer, CheckCircle, XCircle } from "lucide-react";
 import api from "../../services/api";
+import reportService from "../../services/report.service";
+import { useAuth } from "../../context/AuthContext";
 
 const PostReportPreview = () => {
   const { reportId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     const fetchReport = async () => {
       try {
         setLoading(true);
-        // Using api directly to hit the new post-reports endpoint
         const response = await api.get(`/post-reports/${reportId}`);
         setReport(response.data.data || response.data);
       } catch (err) {
@@ -26,6 +30,35 @@ const PostReportPreview = () => {
     };
     fetchReport();
   }, [reportId]);
+
+  const handleApprove = async () => {
+    try {
+      setProcessing(true);
+      await reportService.approvePostReport(reportId);
+      alert("تم اعتماد التقرير بنجاح");
+      navigate("/team-leader");
+    } catch (err) {
+      alert(err.response?.data?.message || "حدث خطأ أثناء الاعتماد.");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleReject = async () => {
+    const reason = window.prompt("يرجى إدخال سبب الرفض:");
+    if (!reason) return;
+
+    try {
+      setProcessing(true);
+      await reportService.rejectPostReport(reportId, reason);
+      alert("تم رفض التقرير");
+      navigate("/team-leader");
+    } catch (err) {
+      alert(err.response?.data?.message || "حدث خطأ أثناء الرفض.");
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -44,80 +77,24 @@ const PostReportPreview = () => {
   }
 
   // ==========================================
-  // Translation Dictionaries (Backend Enums -> Arabic)
+  // Translation Dictionaries 
   // ==========================================
-  const translateSeverity = (val) => {
-    const map = { mild: "خفيفة", moderate: "متوسطة", severe: "شديدة" };
-    return map[val] || val;
-  };
+  const translateSeverity = (val) => ({ mild: "خفيفة", moderate: "متوسطة", severe: "شديدة" }[val] || val);
+  const translatePsychological = (val) => ({ significant_improvement: "تحسن ملحوظ", moderate_improvement: "تحسن متوسط", no_improvement: "لا يوجد تحسن" }[val] || val);
+  const translateBehavioral = (val) => ({ high_commitment: "التزام عالي", medium_commitment: "التزام متوسط", difficulty_commitment: "صعوبة في الالتزام" }[val] || val);
+  const translateSocial = (val) => ({ positive_interaction: "تفاعل إيجابي", limited_interaction: "تفاعل محدود", social_isolation: "عزلة اجتماعية" }[val] || val);
+  const translateOverall = (val) => ({ excellent: "ملحوظ جداً", good: "جيد", limited: "محدود" }[val] || val);
+  const translateTreatment = (val) => ({ fully_committed: "ملتزم تماماً", partially_committed: "ملتزم جزئياً", not_committed: "غير ملتزم" }[val] || val);
+  const translateActivity = (val) => ({ active: "نشط", average: "متوسط", weak: "ضعيف" }[val] || val);
+  const translateEmotional = (val) => ({ stable: "مستقرة", fluctuating: "متقلبة", disturbed: "مضطربة" }[val] || val);
+  const translateFamily = (val) => ({ improved: "تحسنت", unchanged: "لا تتغير", still_tense: "لا تزال متوترة" }[val] || val);
+  const translateCommunity = (val) => ({ ready: "جاهز", needs_support: "يحتاج دعم إضافي", not_ready: "غير مستعد حالياً" }[val] || val);
+  const translateStability = (val) => ({ very_good: "جيد جداً", acceptable: "مقبول", weak: "ضعيف" }[val] || val);
+  const translateReadiness = (val) => ({ ready: "جاهز", under_development: "قيد التطوير", not_ready: "غير مستعد" }[val] || val);
+  const translateStatus = (status) => ({ pending: "قيد الانتظار", approved: "معتمد", rejected: "مرفوض" }[status] || status);
 
-  const translatePsychological = (val) => {
-    const map = { significant_improvement: "تحسن ملحوظ", moderate_improvement: "تحسن متوسط", no_improvement: "لا يوجد تحسن" };
-    return map[val] || val;
-  };
-
-  const translateBehavioral = (val) => {
-    const map = { high_commitment: "التزام عالي", medium_commitment: "التزام متوسط", difficulty_commitment: "صعوبة في الالتزام" };
-    return map[val] || val;
-  };
-
-  const translateSocial = (val) => {
-    const map = { positive_interaction: "تفاعل إيجابي", limited_interaction: "تفاعل محدود", social_isolation: "عزلة اجتماعية" };
-    return map[val] || val;
-  };
-
-  const translateOverall = (val) => {
-    const map = { excellent: "ملحوظ جداً", good: "جيد", limited: "محدود" };
-    return map[val] || val;
-  };
-
-  const translateTreatment = (val) => {
-    const map = { fully_committed: "ملتزم تماماً", partially_committed: "ملتزم جزئياً", not_committed: "غير ملتزم" };
-    return map[val] || val;
-  };
-
-  const translateActivity = (val) => {
-    const map = { active: "نشط", average: "متوسط", weak: "ضعيف" };
-    return map[val] || val;
-  };
-
-  const translateEmotional = (val) => {
-    const map = { stable: "مستقرة", fluctuating: "متقلبة", disturbed: "مضطربة" };
-    return map[val] || val;
-  };
-
-  const translateFamily = (val) => {
-    const map = { improved: "تحسنت", unchanged: "لا تتغير", still_tense: "لا تزال متوترة" };
-    return map[val] || val;
-  };
-
-  const translateCommunity = (val) => {
-    const map = { ready: "جاهز", needs_support: "يحتاج دعم إضافي", not_ready: "غير مستعد حالياً" };
-    return map[val] || val;
-  };
-
-  const translateStability = (val) => {
-    const map = { very_good: "جيد جداً", acceptable: "مقبول", weak: "ضعيف" };
-    return map[val] || val;
-  };
-
-  const translateReadiness = (val) => {
-    const map = { ready: "جاهز", under_development: "قيد التطوير", not_ready: "غير مستعد" };
-    return map[val] || val;
-  };
-
-  const translateStatus = (status) => {
-    const map = { pending: "قيد الانتظار", approved: "معتمد", rejected: "مرفوض" };
-    return map[status] || status;
-  };
-
-  const patientFullName = report.patient
-    ? `${report.patient.firstName || ""} ${report.patient.middleName || ""} ${report.patient.lastName || ""}`
-    : "غير متوفر";
-
-  const teamLeaderFullName = report.teamLeader
-    ? `${report.teamLeader.firstName || ""} ${report.teamLeader.lastName || ""}`
-    : "غير متوفر";
+  const patientFullName = report.patient ? `${report.patient.firstName || ""} ${report.patient.middleName || ""} ${report.patient.lastName || ""}` : "غير متوفر";
+  const teamLeaderFullName = report.teamLeader ? `${report.teamLeader.firstName || ""} ${report.teamLeader.lastName || ""}` : "غير متوفر";
 
   return (
     <div dir="rtl" className="min-h-screen font-['Cairo',sans-serif] text-[15px] leading-[1.9] text-[#27343A]">
@@ -125,24 +102,18 @@ const PostReportPreview = () => {
         
         {/* Header Actions */}
         <div className="mb-8 flex items-center justify-between print:hidden">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-          >
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50">
             <ArrowRight size={20} />
             رجوع
           </button>
-          <button
-            onClick={() => window.print()}
-            className="flex items-center gap-2 rounded-xl bg-[#34C759] px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-[#2FB350]"
-          >
+          <button onClick={() => window.print()} className="flex items-center gap-2 rounded-xl bg-[#34C759] px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-[#2FB350]">
             <Printer size={20} />
             طباعة التقرير
           </button>
         </div>
 
         {/* ================= LETTERHEAD ================= */}
-        <header className="rounded-[28px] border border-[#E7F0EB] bg-white/95 p-[28px] shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
+        <header className="mb-8 rounded-[28px] border border-[#E7F0EB] bg-white/95 p-[28px] shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
           <div className="mb-8 flex flex-wrap items-center justify-center gap-12">
             <img src="/logo.png" alt="Logo" className="h-16 object-contain" />
             <img src="/logo2.png" alt="Logo" className="h-16 object-contain" />
@@ -159,8 +130,22 @@ const PostReportPreview = () => {
           </div>
         </header>
 
+        {/* ================= REJECTION ALERT ================= */}
+        {report.approval?.status === "rejected" && (
+          <div className="mb-10 rounded-[22px] border-2 border-red-200 bg-red-50 p-8 shadow-sm">
+            <div className="flex items-center gap-3 text-red-700 mb-3">
+              <XCircle size={28} />
+              <h2 className="text-2xl font-bold">تم رفض هذا التقرير</h2>
+            </div>
+            <p className="text-lg text-red-800">
+              <span className="font-bold">سبب الرفض: </span>
+              {report.approval?.rejectionReason || "لم يقم رئيس الفريق بكتابة سبب الرفض."}
+            </p>
+          </div>
+        )}
+
         {/* ================= 1. PATIENT INFO ================= */}
-        <section className="mt-12">
+        <section className="mt-8">
           <div className="mb-6 flex items-center gap-4">
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#EAF5F0] font-bold text-[#1E7A5A]">1</span>
             <h2 className="text-2xl font-bold text-[#1E7A5A]">بيانات المستفيد</h2>
@@ -298,7 +283,6 @@ const PostReportPreview = () => {
 
         {/* ================= 7, 8, 9. NOTES AND RECOMMENDATIONS ================= */}
         <section className="mt-12 grid grid-cols-1 gap-6">
-          {/* Section 7 */}
           <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
             <div className="mb-4 flex items-center gap-3">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#EAF5F0] font-bold text-[#1E7A5A]">7</span>
@@ -308,8 +292,6 @@ const PostReportPreview = () => {
               {report.familyNotification?.notes || "لا توجد ملاحظات"}
             </div>
           </div>
-
-          {/* Section 8 */}
           <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
             <div className="mb-4 flex items-center gap-3">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#EAF5F0] font-bold text-[#1E7A5A]">8</span>
@@ -319,8 +301,6 @@ const PostReportPreview = () => {
               {report.recommendations || "لا توجد توصيات"}
             </div>
           </div>
-
-          {/* Section 9 */}
           <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
             <div className="mb-4 flex items-center gap-3">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#EAF5F0] font-bold text-[#1E7A5A]">9</span>
@@ -332,14 +312,14 @@ const PostReportPreview = () => {
           </div>
         </section>
 
-        {/* ================= 10. SIGNATURES ================= */}
+        {/* ================= 10. SIGNATURES & REJECTION BOX ================= */}
         <section className="mt-12">
           <div className="mb-6 flex items-center gap-4">
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#EAF5F0] font-bold text-[#1E7A5A]">10</span>
             <h2 className="text-2xl font-bold text-[#1E7A5A]">الاعتماد والتوقيعات</h2>
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* Doctor Info */}
+            
             <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
               <h3 className="mb-8 border-b border-[#E7F0EB] pb-4 text-center text-xl font-bold text-[#1E7A5A]">مرشد التعافي (مُنشئ التقرير)</h3>
               <div className="space-y-6">
@@ -358,7 +338,6 @@ const PostReportPreview = () => {
               </div>
             </div>
 
-            {/* Team Leader / Approval Info */}
             <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
               <h3 className="mb-8 border-b border-[#E7F0EB] pb-4 text-center text-xl font-bold text-[#1E7A5A]">رئيس الفريق (الاعتماد)</h3>
               <div className="space-y-6">
@@ -368,11 +347,7 @@ const PostReportPreview = () => {
                 </div>
                 <div className="flex justify-between border-b border-gray-100 pb-3">
                   <span className="font-semibold text-gray-500">حالة الاعتماد</span>
-                  <span className={`font-bold ${
-                    report.approval?.status === "approved" ? "text-green-600" :
-                    report.approval?.status === "rejected" ? "text-red-600" :
-                    "text-yellow-600"
-                  }`}>
+                  <span className={`font-bold ${report.approval?.status === "approved" ? "text-green-600" : report.approval?.status === "rejected" ? "text-red-600" : "text-yellow-600"}`}>
                     {translateStatus(report.approval?.status)}
                   </span>
                 </div>
@@ -384,10 +359,42 @@ const PostReportPreview = () => {
                     </span>
                   </div>
                 )}
+                
+                {/* Rejection Reason inside Signature Box */}
+                {report.approval?.status === "rejected" && (
+                  <div className="flex flex-col gap-2 pt-3">
+                    <span className="font-semibold text-red-500">سبب الرفض المسجل</span>
+                    <span className="rounded-xl bg-red-50 p-4 font-bold text-red-700 leading-relaxed border border-red-100">
+                      {report.approval?.rejectionReason || "لم يتم توضيح السبب."}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </section>
+
+        {/* ================= TEAM LEADER ACTIONS ================= */}
+        {user?.role === "teamLeader" && report?.approval?.status === "pending" && (
+          <div className="mt-12 flex flex-col justify-center gap-5 sm:flex-row print:hidden">
+            <button
+              onClick={handleApprove}
+              disabled={processing}
+              className="flex h-[58px] w-full max-w-[400px] items-center justify-center gap-2 rounded-2xl bg-[#34C759] text-[18px] font-bold text-white transition hover:-translate-y-[1px] hover:bg-[#2EB84E] disabled:opacity-60 sm:flex-1"
+            >
+              {processing ? <Loader2 className="animate-spin" size={20} /> : <CheckCircle size={20} />}
+              {processing ? "جاري الاعتماد..." : "اعتماد التقرير"}
+            </button>
+            <button
+              onClick={handleReject}
+              disabled={processing}
+              className="flex h-[58px] w-full max-w-[400px] items-center justify-center gap-2 rounded-2xl bg-red-500 text-[18px] font-bold text-white transition hover:-translate-y-[1px] hover:bg-red-600 disabled:opacity-60 sm:flex-1"
+            >
+              {processing ? <Loader2 className="animate-spin" size={20} /> : <XCircle size={20} />}
+              {processing ? "جاري الرفض..." : "رفض التقرير"}
+            </button>
+          </div>
+        )}
 
       </div>
     </div>

@@ -34,6 +34,9 @@ class ReportService {
   rejectPostReport(id, reason) {
     return api.patch(`/post-reports/${id}/reject`, { reason });
   }
+  getPostReport(id) {
+    return api.get(`/post-reports/${id}`);
+  }
 }
 
 export default new ReportService();

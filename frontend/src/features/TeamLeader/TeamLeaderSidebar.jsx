@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { ClipboardList, Users, UserRound } from "lucide-react";
+import { ClipboardList, Users, UserRound, LogOut } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import reportService from "../../services/report.service";
 import userService from "../../services/user.service";
 import patientService from "../../services/patient.service";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const TeamLeaderSidebar = () => {
   const [stats, setStats] = useState({
@@ -12,7 +14,13 @@ const TeamLeaderSidebar = () => {
     pendingReports: 0,
     patients: 0,
   });
-
+  
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+ const handleLogout = () => {
+  logout();
+  navigate("/", { replace: true });
+};
   useEffect(() => {
     const loadStats = async () => {
       try {
@@ -24,7 +32,9 @@ const TeamLeaderSidebar = () => {
         ]);
         
         const pendingCount = (preRes.data?.data?.length || 0) + (postRes.data?.data?.length || 0);
-
+      
+      
+   
         setStats({
           doctors: teamRes.data?.data?.length || 0,
           patients: patientsRes.data?.data?.length || 0,
@@ -88,6 +98,13 @@ const TeamLeaderSidebar = () => {
             </div>
           </div>
         </div>
+         <button
+  onClick={handleLogout}
+  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-red-200 text-red-600 transition hover:bg-red-50"
+>
+  <LogOut size={18} />
+  تسجيل الخروج
+</button>
       </div>
     </aside>
   );
