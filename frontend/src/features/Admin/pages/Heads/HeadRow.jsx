@@ -22,15 +22,7 @@ const HeadRow = ({ head }) => {
       </td>
 
       <td className="px-6 py-5 text-gray-600">
-        {head.licenseNumber || "-"}
-      </td>
-
-      <td className="px-6 py-5 text-gray-600">
         {head.email || "-"}
-      </td>
-
-      <td className="px-6 py-5 font-medium text-[#2F2F2F]">
-        {head.department?.name || head.department || "غير محدد"}
       </td>
 
       <td className="rounded-l-2xl px-6 py-5">

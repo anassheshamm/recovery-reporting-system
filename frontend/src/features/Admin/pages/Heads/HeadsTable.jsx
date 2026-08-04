@@ -21,17 +21,13 @@ const HeadsTable = ({ heads = [] }) => {
               رقم الهاتف
             </th>
 
-            <th className="px-6 py-5 text-right font-semibold">
-              رقم الرخصة
-            </th>
+            {/* Removed License Number column */}
 
             <th className="px-6 py-5 text-right font-semibold">
               البريد الإلكتروني
             </th>
 
-            <th className="px-6 py-5 text-right font-semibold">
-              مسؤول عن قسم
-            </th>
+            {/* Removed Department column */}
 
             <th className="rounded-l-2xl px-6 py-5 text-center font-semibold">
               رؤية الملف
@@ -43,7 +39,7 @@ const HeadsTable = ({ heads = [] }) => {
           {heads.length === 0 ? (
             <tr>
               <td
-                colSpan={7}
+                colSpan={5} // Changed colSpan from 7 to 5 due to removed columns
                 className="py-16 text-center text-gray-400"
               >
                 لا يوجد رؤساء أقسام
