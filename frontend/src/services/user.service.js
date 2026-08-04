@@ -11,6 +11,8 @@ const userService = {
   createUser(data) {
     return api.post("/users", data);
   }
+
+  
 };
 
 export default userService;

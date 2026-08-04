@@ -37,8 +37,8 @@ const DoctorsadminPage = () => {
   return (
     <div dir="rtl" className="mx-auto max-w-[1300px]">
       <PageHeader
-        title="إدارة الأطباء"
-        description="عرض وإدارة حسابات الأطباء ومرشدي التعافي"
+        title="إدارة المعالجين"
+        description="عرض وإدارة حسابات المعالجين ومرشدي التعافي"
         downloadText="تصدير القائمة"
       />
 

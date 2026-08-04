@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import HeadsHeader from "./HeadsHeader";
+import HeadsHeader from "../../../components/PageHeader";
 import HeadsTable from "./HeadsTable";
 import api from "../../../../services/api";
 
@@ -60,7 +60,11 @@ const HeadsPage = () => {
 
   return (
     <div dir="rtl" className="mx-auto max-w-[1350px] px-8 py-10">
-      <HeadsHeader onDownload={handleDownload} />
+      <HeadsHeader
+      title="إدارة رؤساء الفرق"
+        description="عرض وإدارة حسابات رؤساء الفرق"
+        downloadText="تصدير القائمة"
+      onDownload={handleDownload} />
 
       <div className="mt-10">
         {loading ? (
