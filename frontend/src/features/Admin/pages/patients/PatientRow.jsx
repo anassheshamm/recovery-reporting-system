@@ -7,9 +7,9 @@ const PatientRow = ({ patient }) => {
     .filter(Boolean)
     .join(" ");
 
-  // Extract assigned doctor full name if populated
-  const doctorName = patient.therapist
-    ? [patient.therapist.firstName, patient.therapist.middleName, patient.therapist.lastName]
+  // Extract assigned doctor full name if populated (Changed from therapist to doctor)
+  const doctorName = patient.doctor
+    ? [patient.doctor.firstName, patient.doctor.middleName, patient.doctor.lastName]
         .filter(Boolean)
         .join(" ")
     : "غير محدد";
@@ -28,9 +28,7 @@ const PatientRow = ({ patient }) => {
         {patient.phone || "-"}
       </td>
 
-      <td className="px-6 py-5 text-right text-gray-600">
-        {patient.program?.title || patient.program || "غير مسجل"}
-      </td>
+      {/* Program column removed as it doesn't exist in backend */}
 
       <td className="px-6 py-5 text-right text-gray-600">
         {patient.email || "-"}
