@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, House } from "lucide-react";
 
-const BackButton = () => {
+const BackButton = ({ showHome = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -23,9 +23,36 @@ const BackButton = () => {
     return null;
   }
 
-  // 3. Otherwise, show the button
+  const handleHome = () => {
+    if (location.pathname.startsWith("/doctor")) {
+      navigate("/doctor");
+    } else if (
+      location.pathname.startsWith("/team-leader")
+    ) {
+      navigate("/team-leader");
+    } else if (
+      location.pathname.startsWith("/admin")
+    ) {
+      navigate("/admin");
+    }
+  };
+
+  // 3. Otherwise, show the button(s)
   return (
-    <div className="mb-6 flex justify-start print:hidden">
+    <div className="mb-6 flex justify-between print:hidden">
+      {showHome ? (
+        <button
+          onClick={handleHome}
+          type="button"
+          className="flex w-fit items-center gap-2 rounded-xl bg-[#35C759] px-5 py-2.5 font-semibold text-white shadow-sm transition hover:bg-[#2FB350] active:scale-95"
+        >
+          <House size={20} />
+          <span>الرئيسية</span>
+        </button>
+      ) : (
+        <div />
+      )}
+
       <button
         onClick={() => navigate(-1)}
         type="button"
