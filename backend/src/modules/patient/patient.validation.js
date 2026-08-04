@@ -16,9 +16,11 @@ export const createPatientValidation = [
     .withMessage("Last name is required")
     .trim(),
 
-  body("nationalId")
-    .isLength({ min: 14, max: 14 })
-    .withMessage("National ID must be 14 digits"),
+body("nationalId")
+  .isLength({ min: 10, max: 15 })
+  .withMessage(
+    "National ID must be between 10 and 15 characters."
+  ),
 
   body("gender")
     .isIn(["male", "female"])
@@ -45,9 +47,9 @@ export const createPatientValidation = [
   body("alternativePhone").optional(),
 
   body("email")
-    .optional()
-    .isEmail()
-    .withMessage("Invalid email"),
+  .optional({ checkFalsy: true })
+  .isEmail()
+  .withMessage("Invalid email"),
 
   body("emergencyContactPhone").optional(),
 
@@ -73,9 +75,10 @@ export const updatePatientValidation = [
     .notEmpty(),
 
   body("nationalId")
-    .optional()
-    .isLength({ min: 14, max: 14 })
-    .withMessage("National ID must be 14 digits"),
+  .isLength({ min: 10, max: 15 })
+  .withMessage(
+    "National ID must be between 10 and 15 characters."
+  ),
 
   body("gender")
     .optional()
