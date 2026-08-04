@@ -55,3 +55,67 @@ export const createPatientValidation = [
 
   body("address").optional(),
 ];
+
+export const updatePatientValidation = [
+  body("firstName")
+    .optional()
+    .trim()
+    .notEmpty(),
+
+  body("middleName")
+    .optional()
+    .trim()
+    .notEmpty(),
+
+  body("lastName")
+    .optional()
+    .trim()
+    .notEmpty(),
+
+  body("nationalId")
+    .optional()
+    .isLength({ min: 14, max: 14 })
+    .withMessage("National ID must be 14 digits"),
+
+  body("gender")
+    .optional()
+    .isIn(["male", "female"]),
+
+  body("nationality")
+    .optional(),
+
+  body("occupation")
+    .optional(),
+
+  body("maritalStatus")
+    .optional()
+    .isIn([
+      "single",
+      "married",
+      "divorced",
+      "widowed",
+    ]),
+
+  body("dateOfBirth")
+    .optional()
+    .isISO8601(),
+
+  body("phone")
+    .optional(),
+
+  body("alternativePhone")
+    .optional(),
+
+  body("email")
+    .optional()
+    .isEmail(),
+
+  body("emergencyContactPhone")
+    .optional(),
+
+  body("emergencyContactRelation")
+    .optional(),
+
+  body("address")
+    .optional(),
+];

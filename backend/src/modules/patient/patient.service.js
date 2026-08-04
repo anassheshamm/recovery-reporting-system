@@ -125,6 +125,44 @@ class PatientService {
     };
   }
 
+  async update(patientId, data, user) {
+  const patient = await Patient.findOne({
+    _id: patientId,
+    doctor: user._id,
+  });
+
+  if (!patient) {
+    throw new AppError("Patient not found.", 404);
+  }
+
+  // منع تكرار الرقم القومي
+  if (
+    data.nationalId &&
+    data.nationalId !== patient.nationalId
+  ) {
+    const existingPatient = await Patient.findOne({
+      nationalId: data.nationalId,
+      _id: { $ne: patientId },
+    });
+
+    if (existingPatient) {
+      throw new AppError(
+        "National ID already exists.",
+        409
+      );
+    }
+  }
+
+  Object.assign(patient, data);
+
+  await patient.save();
+
+  return patient.populate(
+    "doctor",
+    "firstName middleName lastName email role"
+  );
+}
+
   async getDashboardStats(doctorId) {
     console.log("Doctor ID:", doctorId);
 
