@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Calendar,
   Globe,
@@ -6,12 +6,14 @@ import {
   Phone,
   User,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate ,useParams} from "react-router-dom";
 import BackButton from "../components/BackButton";
 import patientService from "../../services/patient.service";
 
 const CreatePatientPage = () => {
   const navigate = useNavigate();
+  const { patientId } = useParams();
+  const isEdit = !!patientId;
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -60,44 +62,114 @@ const CreatePatientPage = () => {
     }
   };
 
-const createPatient = async (goToReport = false) => {
-  try {
-    setLoading(true);
-    setError("");
+  const loadPatient = async () => {
+    if (!isEdit) return;
 
-    const { data } = await patientService.createPatient(form);
+    try {
+      setLoading(true);
 
-    alert("تم إنشاء المستفيد بنجاح");
+      const res = await patientService.getPatientById(patientId);
 
-    if (goToReport) {
-      navigate(`/doctor/reports/beneficiary/${data._id}`);
-    } else {
-      navigate(`/doctor/patient/${data._id}`);
+      const patient = res.data.patient;
+
+      setForm({
+        firstName: patient.firstName || "",
+        middleName: patient.middleName || "",
+        lastName: patient.lastName || "",
+        nationalId: patient.nationalId || "",
+        gender: patient.gender || "",
+        nationality: patient.nationality || "",
+        dateOfBirth: patient.dateOfBirth
+          ? patient.dateOfBirth.split("T")[0]
+          : "",
+        occupation: patient.occupation || "",
+        maritalStatus: patient.maritalStatus || "",
+        phone: patient.phone || "",
+        alternativePhone: patient.alternativePhone || "",
+        emergencyContactPhone:
+          patient.emergencyContactPhone || "",
+        emergencyContactRelation:
+          patient.emergencyContactRelation || "",
+        email: patient.email || "",
+        address: patient.address || "",
+      });
+    } catch (err) {
+      console.error(err);
+      setError("فشل تحميل بيانات المستفيد");
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error(err);
+  };
 
-    if (err.response?.data?.errors?.length) {
-      setError(err.response.data.errors[0].msg);
-    } else {
-      setError(
-        err.response?.data?.message ||
-          "حدث خطأ أثناء إنشاء المستفيد"
+  const savePatient = async (goToReport = false) => {
+    try {
+      setLoading(true);
+      setError("");
+
+      let patient;
+
+      if (isEdit) {
+        const res =
+          await patientService.updatePatient(
+            patientId,
+            form
+          );
+
+        patient = res.data;
+      } else {
+        const res =
+          await patientService.createPatient(
+            form
+          );
+
+        patient = res.data;
+      }
+
+      alert(
+        isEdit
+          ? "تم تعديل بيانات المستفيد بنجاح"
+          : "تم إنشاء المستفيد بنجاح"
       );
-    }
-  } finally {
-    setLoading(false);
-  }
-};
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  await createPatient(false);
-};
 
+      if (goToReport) {
+        navigate(
+          `/doctor/reports/beneficiary/${patient._id}`
+        );
+      } else {
+        navigate(
+          `/doctor/patient/${patient._id}`
+        );
+      }
+    } catch (err) {
+      console.error(err);
+
+      if (err.response?.data?.errors?.length) {
+        setError(err.response.data.errors[0].msg);
+      } else {
+        setError(
+          err.response?.data?.message ||
+            (isEdit
+              ? "حدث خطأ أثناء تعديل المستفيد"
+              : "حدث خطأ أثناء إنشاء المستفيد")
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await savePatient(false);
+  };
 
   const handleSaveAndAddReport = async () => {
-    await createPatient(true);
+    await savePatient(true);
   };
+
+  useEffect(() => {
+    loadPatient();
+  }, [patientId]);
 
   return (
     <main
@@ -113,12 +185,12 @@ const handleSubmit = async (e) => {
         <div className="mb-14">
 
           <h1 className="text-5xl font-bold text-[#111827]">
-            إضافة مستفيد جديد
-          </h1>
+{isEdit ? "تعديل بيانات المستفيد" : "إضافة مستفيد جديد"}          </h1>
 
           <p className="mt-3 text-lg text-gray-500">
-            يرجى إدخال البيانات الأساسية للمستفيد
-          </p>
+{isEdit
+  ? "يمكنك تعديل بيانات المستفيد"
+  : "يرجى إدخال البيانات الأساسية للمستفيد"}          </p>
 
         </div>
 
@@ -720,54 +792,55 @@ const handleSubmit = async (e) => {
           {/* Buttons */}
           {/* ========================= */}
 
-          <div className="mt-16 flex items-center justify-center gap-4">
+<div className="mt-16 flex items-center justify-center gap-4">
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="
-                rounded-xl
-                bg-[#35C759]
-                px-8
-                py-4
-                text-lg
-                font-semibold
-                text-white
-                transition
-                hover:bg-[#2FB350]
-                disabled:cursor-not-allowed
-                disabled:opacity-60
-              "
-            >
-              {loading ? "جاري الحفظ..." : "حفظ المعلومات"}
-            </button>
+  <button
+    type="submit"
+    disabled={loading}
+    className="
+      rounded-xl
+      bg-[#35C759]
+      px-8
+      py-4
+      text-lg
+      font-semibold
+      text-white
+      transition
+      hover:bg-[#2FB350]
+      disabled:cursor-not-allowed
+      disabled:opacity-60
+    "
+  >
+    {loading ? "جاري الحفظ..." : "حفظ المعلومات"}
+  </button>
 
-            <button
-              type="button"
-              disabled={loading}
-              onClick={handleSaveAndAddReport}
-              className="
-                rounded-xl
-                border
-                border-[#35C759]
-                px-8
-                py-4
-                text-lg
-                font-semibold
-                text-[#247C5A]
-                transition
-                hover:bg-[#EDF8F2]
-                disabled:cursor-not-allowed
-                disabled:opacity-60
-              "
-            >
-              {loading
-                ? "جاري الحفظ..."
-                : "حفظ وإضافة تقرير"}
-            </button>
+  {!isEdit && (
+    <button
+      type="button"
+      disabled={loading}
+      onClick={handleSaveAndAddReport}
+      className="
+        rounded-xl
+        border
+        border-[#35C759]
+        px-8
+        py-4
+        text-lg
+        font-semibold
+        text-[#247C5A]
+        transition
+        hover:bg-[#EDF8F2]
+        disabled:cursor-not-allowed
+        disabled:opacity-60
+      "
+    >
+      {loading
+        ? "جاري الحفظ..."
+        : "حفظ وإضافة تقرير"}
+    </button>
+  )}
 
-          </div>
-
+</div>
         </form>
 
       </div>

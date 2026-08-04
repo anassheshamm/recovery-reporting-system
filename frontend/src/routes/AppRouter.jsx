@@ -91,8 +91,21 @@ export default function AppRouter() {
             }
           >
             <Route index element={<DoctorsPage />} />
-            <Route path="new" element={<CreatePatientPage />} />
-            <Route path="patient/:patientId" element={<PatientProfilePage />} />
+
+<Route
+  path="new"
+  element={<CreatePatientPage />}
+/>
+
+<Route
+  path="edit-patient/:patientId"
+  element={<CreatePatientPage />}
+/>
+
+<Route
+  path="patient/:patientId"
+  element={<PatientProfilePage />}
+/>
             <Route path="reports/beneficiary/:patientId" element={<BeneficiaryReportPage />} />
             <Route path="reports/secondary/:patientId" element={<PostReportPage />} />
           </Route>
