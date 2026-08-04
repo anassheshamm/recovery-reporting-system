@@ -1,7 +1,7 @@
 import api from "./api";
 
 class ReportService {
-  // Pre-Reports
+  // ================= Pre-Reports =================
   createPreReport(data) {
     return api.post("/pre-reports", data);
   }
@@ -21,7 +21,10 @@ class ReportService {
     return api.patch(`/pre-reports/${id}/reject`, { reason });
   }
 
-  // Post-Reports
+  // ================= Post-Reports =================
+  createPostReport(data) {
+    return api.post("/post-reports", data);
+  }
   getPendingPostReports() {
     return api.get("/post-reports/pending");
   }
