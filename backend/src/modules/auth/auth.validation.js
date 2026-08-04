@@ -37,7 +37,7 @@ export const registerValidation = [
   body("nationalId")
     .isLength({ min: 14, max: 14 })
     .withMessage("National ID must be 14 digits."),
-
+  
   body("phone")
     .notEmpty()
     .withMessage("Phone is required."),
