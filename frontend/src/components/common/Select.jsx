@@ -1,108 +1,64 @@
 import { forwardRef } from "react";
-import { ChevronDown } from "lucide-react";
 
-const Select = forwardRef(
-  (
-    {
-      label,
-      icon,
-      options = [],
-      error,
-      className = "",
-      containerClassName = "",
-      ...props
-    },
-    ref
-  ) => {
-    return (
-      <div className={`flex flex-col gap-2 ${containerClassName}`}>
-        {label && (
-          <label className="text-[18px] font-semibold text-slate-800">
-            {label}
-          </label>
-        )}
+const Select = forwardRef(({ label, icon, options = [], error, className = "", ...props }, ref) => {
+  return (
+    <div className="flex flex-col gap-2">
+      {/* Label */}
+      {label && (
+        <label className="text-sm font-semibold text-gray-700">
+          {label}
+        </label>
+      )}
 
-        <div className="relative">
+      {/* Select Wrapper */}
+      <div className="relative">
+        <select
+          ref={ref}
+          className={`
+            h-12 w-full appearance-none rounded-xl border bg-white px-4 text-right outline-none transition
+            ${icon ? "pr-10" : ""}
+            ${
+              error
+                ? "border-red-500 focus:border-red-500 focus:ring-red-500/10"
+                : "border-gray-300 focus:border-[#35C759] focus:ring-[#35C759]/10"
+            }
+            focus:ring-2
+            ${className}
+          `}
+          {...props}
+        >
+          <option value="" disabled>اختر...</option>
+          
+          {/* Options Mapping */}
+          {options.map((option, index) => {
+            // Check if the option is an object {label, value} or just a normal string
+            const isObject = typeof option === "object" && option !== null;
+            const value = isObject ? option.value : option;
+            const label = isObject ? option.label : option;
 
-          {/* Left Dropdown Arrow */}
-
-          <ChevronDown
-            size={18}
-            className="
-              pointer-events-none
-              absolute
-              left-5
-              top-1/2
-              -translate-y-1/2
-              text-slate-400
-            "
-          />
-
-          {/* Right Icon */}
-
-          {icon && (
-            <div
-              className="
-                pointer-events-none
-                absolute
-                right-5
-                top-1/2
-                -translate-y-1/2
-                text-slate-400
-              "
-            >
-              {icon}
-            </div>
-          )}
-
-          <select
-            ref={ref}
-            dir="rtl"
-            className={`
-              h-14
-              w-full
-              appearance-none
-              rounded-2xl
-              border
-              border-[#D7E3F4]
-              bg-white
-              pr-14
-              pl-12
-              text-base
-              text-slate-700
-              outline-none
-              transition-all
-              duration-200
-              focus:border-[#35C759]
-              focus:ring-4
-              focus:ring-[#35C759]/10
-              ${className}
-            `}
-            {...props}
-          >
-            <option value="">اختر</option>
-
-            {options.map((option) => (
-              <option
-                key={option}
-                value={option}
-              >
-                {option}
+            return (
+              <option key={value || index} value={value}>
+                {label}
               </option>
-            ))}
-          </select>
-        </div>
+            );
+          })}
+        </select>
 
-        {error && (
-          <span className="text-sm text-red-500">
-            {error}
-          </span>
+        {/* Icon */}
+        {icon && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+            {icon}
+          </div>
         )}
       </div>
-    );
-  }
-);
+
+      {/* Error Message */}
+      {error && (
+        <span className="text-xs font-medium text-red-500">{error}</span>
+      )}
+    </div>
+  );
+});
 
 Select.displayName = "Select";
-
 export default Select;
