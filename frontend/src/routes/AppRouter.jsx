@@ -1,7 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
-import AuthLayout from "../layouts/AuthLayout";
-
 import Register from "../pages/auth/register";
 import LoginPage from "../pages/auth/LoginPage";
 import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
@@ -41,29 +39,12 @@ export default function AppRouter() {
         <Routes>
           
           {/* ================= Authentication ================= */}
-          <Route
-            path="/"
-            element={
-              <PublicRoute>
-                <LoginPage />
-              </PublicRoute>
-            }
-          />
-
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                <LoginPage />
-              </PublicRoute>
-            }
-          />
-          
-          <Route element={<AuthLayout />}>
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-          </Route>
+          {/* Properly wrapped in PublicRoute and AuthLayout is removed */}
+          <Route path="/" element={<PublicRoute><LoginPage /></PublicRoute>} />
+          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+          <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+          <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
+          <Route path="/reset-password/:token" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
 
           {/* ================= Admin ================= */}
           <Route
@@ -91,21 +72,9 @@ export default function AppRouter() {
             }
           >
             <Route index element={<DoctorsPage />} />
-
-<Route
-  path="new"
-  element={<CreatePatientPage />}
-/>
-
-<Route
-  path="edit-patient/:patientId"
-  element={<CreatePatientPage />}
-/>
-
-<Route
-  path="patient/:patientId"
-  element={<PatientProfilePage />}
-/>
+            <Route path="new" element={<CreatePatientPage />} />
+            <Route path="edit-patient/:patientId" element={<CreatePatientPage />} />
+            <Route path="patient/:patientId" element={<PatientProfilePage />} />
             <Route path="reports/beneficiary/:patientId" element={<BeneficiaryReportPage />} />
             <Route path="reports/secondary/:patientId" element={<PostReportPage />} />
           </Route>
