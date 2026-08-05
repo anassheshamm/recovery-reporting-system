@@ -40,8 +40,7 @@ const PatientRow = ({ patient }) => {
 
       <td className="rounded-l-2xl px-6 py-5">
         <div className="flex justify-center">
-          <Link
-            to={`/doctor/patient/${patient._id}`}
+          <Link to={`/admin/patient/${patient._id}`}
             className="flex items-center gap-2 rounded-xl px-4 py-2 text-[#35C759] transition hover:bg-[#EDF8F2]"
           >
             <Eye size={18} />

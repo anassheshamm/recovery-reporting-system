@@ -60,6 +60,27 @@ export default function AppRouter() {
             <Route path="doctors" element={<DoctorsadminPage />} />
             <Route path="patients" element={<PatientsPage />} />
             <Route path="heads" element={<HeadsPage />} />
+            <Route
+    path="patient/:patientId"
+    element={<PatientProfilePage />}
+  />
+            <Route
+  path="/admin/pre-reports/:reportId"
+  element={
+    <ProtectedRoute roles={["admin"]}>
+      <ReportPreviewPage />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/admin/post-reports/:reportId"
+  element={
+    <ProtectedRoute roles={["admin"]}>
+      <PostReport />
+    </ProtectedRoute>
+  }
+/>
           </Route>
 
           {/* ================= Doctor ================= */}
