@@ -231,17 +231,7 @@ const LoginPage = () => {
               نسيت كلمة المرور؟
             </Link>
 
-            <label className="flex items-center gap-2 text-sm">
-              <span>تذكرني</span>
-
-              <input
-                type="checkbox"
-                name="rememberMe"
-                checked={form.rememberMe}
-                onChange={handleChange}
-                className="h-4 w-4 accent-[#35C759]"
-              />
-            </label>
+            
 
           </div>
 
