@@ -15,7 +15,7 @@ const protect = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await userService.findById(decoded.sub);
-console.log(decoded);
+console.log("Decoded:", decoded);
         if (!user) {
             return next(new AppError("Not authorized, user not found.", 401));
         }
@@ -23,8 +23,10 @@ console.log(decoded);
         req.user = user; // Attach the user object to the request
         next();
     } catch (error) {
-        return next(new AppError("Invalid or expired token.", 401));
-    }   
+  console.error("JWT ERROR:", error);
+
+  return next(new AppError("Invalid or expired token.", 401));
+}   
 };
 
 export default protect;
