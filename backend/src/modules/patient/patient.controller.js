@@ -64,6 +64,26 @@ async getAll(req, res, next) {
   }
 }
 
+async update(req, res, next) {
+  try {
+    const patient =
+      await patientService.update(
+        req.params.id,
+        req.body,
+        req.user
+      );
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "Patient updated successfully.",
+      data: patient,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async getDashboardStats(req, res, next) {
   try {
     const stats = await patientService.getDashboardStats(

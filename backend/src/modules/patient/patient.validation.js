@@ -16,9 +16,11 @@ export const createPatientValidation = [
     .withMessage("Last name is required")
     .trim(),
 
-  body("nationalId")
-    .isLength({ min: 14, max: 14 })
-    .withMessage("National ID must be 14 digits"),
+body("nationalId")
+  .isLength({ min: 10, max: 15 })
+  .withMessage(
+    "National ID must be between 10 and 15 characters."
+  ),
 
   body("gender")
     .isIn(["male", "female"])
@@ -45,13 +47,78 @@ export const createPatientValidation = [
   body("alternativePhone").optional(),
 
   body("email")
-    .optional()
-    .isEmail()
-    .withMessage("Invalid email"),
+  .optional({ checkFalsy: true })
+  .isEmail()
+  .withMessage("Invalid email"),
 
   body("emergencyContactPhone").optional(),
 
   body("emergencyContactRelation").optional(),
 
   body("address").optional(),
+];
+
+export const updatePatientValidation = [
+  body("firstName")
+    .optional()
+    .trim()
+    .notEmpty(),
+
+  body("middleName")
+    .optional()
+    .trim()
+    .notEmpty(),
+
+  body("lastName")
+    .optional()
+    .trim()
+    .notEmpty(),
+
+  body("nationalId")
+  .isLength({ min: 10, max: 15 })
+  .withMessage(
+    "National ID must be between 10 and 15 characters."
+  ),
+
+  body("gender")
+    .optional()
+    .isIn(["male", "female"]),
+
+  body("nationality")
+    .optional(),
+
+  body("occupation")
+    .optional(),
+
+  body("maritalStatus")
+    .optional()
+    .isIn([
+      "single",
+      "married",
+      "divorced",
+      "widowed",
+    ]),
+
+  body("dateOfBirth")
+    .optional()
+    .isISO8601(),
+
+  body("phone")
+    .optional(),
+
+  body("alternativePhone")
+    .optional(),
+
+  body("email")
+    .optional()
+    .isEmail(),
+
+  body("emergencyContactPhone")
+    .optional(),
+
+  body("emergencyContactRelation")
+    .optional(),
+
+  body("address")
+    .optional(),
 ];

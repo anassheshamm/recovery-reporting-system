@@ -130,7 +130,7 @@ const PatientProfilePage = () => {
       className="min-h-screen bg-[#FCFEFD] px-10 py-10"
     >
       <div className="mx-auto max-w-[1500px]">
-<BackButton />
+<BackButton showHome />
         {/* Breadcrumb */}
 
       

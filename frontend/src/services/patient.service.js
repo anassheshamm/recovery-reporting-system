@@ -82,7 +82,7 @@ const patientService = {
       address: form.address,
     };
 
-    const response = await api.put(`/patients/${id}`, payload);
+    const response = await api.patch(`/patients/${id}`, payload);
     return response.data;
   },
 
