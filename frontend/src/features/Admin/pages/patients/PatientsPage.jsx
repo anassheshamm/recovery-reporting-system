@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "../../../services/api";
+import api from "../../../../services/api";
 import PatientsHeader from "../../../components/PageHeader";
 import PatientsTable from "./PatientsTable";
 
