@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../../../services/api";
 import PatientsHeader from "../../../components/PageHeader";
 import PatientsTable from "./PatientsTable";
 
@@ -17,11 +17,7 @@ const PatientsPage = () => {
         const token = localStorage.getItem("token"); // Retrieve stored JWT auth token
     console.log("API_BASE_URL:", API_BASE_URL);
     console.log("TOKEN:", token);
-        const response = await axios.get(`${API_BASE_URL}/patients`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+       const response = await api.get("/patients");
 
         if (response.data.success) {
           setPatients(response.data.data || []);
