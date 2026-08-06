@@ -659,7 +659,7 @@ const basePath = location.pathname.startsWith("/admin")
     setIsReportModalOpen(false);
 
     navigate(
-      `/doctor/reports/beneficiary/${patient._id}`
+      `${basePath}/reports/beneficiary/${patient._id}`
     );
   }}
   className="
