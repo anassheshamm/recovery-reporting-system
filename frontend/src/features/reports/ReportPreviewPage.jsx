@@ -4,6 +4,7 @@ import { ArrowRight, Loader2, Printer, CheckCircle, XCircle } from "lucide-react
 import api from "../../services/api";
 import reportService from "../../services/report.service";
 import { useAuth } from "../../context/AuthContext";
+import BackButton from "../components/BackButton";
 
 const ReportPreviewPage = () => {
   const { reportId } = useParams();
@@ -90,6 +91,10 @@ const ReportPreviewPage = () => {
 
   return (
     <div dir="rtl" className="min-h-screen font-['Cairo',sans-serif] text-[15px] leading-[1.9] text-[#27343A]">
+      <div>
+      <BackButton />
+      
+    </div>
       <div className="mx-auto my-10 w-full max-w-[1100px] px-5 md:px-10">
         
         {/* Header Actions */}

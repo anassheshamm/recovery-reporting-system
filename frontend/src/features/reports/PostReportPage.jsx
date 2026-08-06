@@ -4,6 +4,8 @@ import patientService from "../../services/patient.service";
 import userService from "../../services/user.service";
 import reportService from "../../services/report.service";
 import { useAuth } from "../../context/AuthContext";
+import BackButton from "../components/BackButton";
+import Swal from "sweetalert2";
 
 const PostReportPage = () => {
   const navigate = useNavigate();
@@ -75,7 +77,14 @@ const PostReportPage = () => {
         
       } catch (error) {
         console.error("Failed to load data", error);
-        alert("حدث خطأ أثناء تحميل البيانات");
+        Swal.fire({
+          title: "خطأ",
+          text: "حدث خطأ أثناء تحميل البيانات",
+          icon: "error",
+          confirmButtonColor: "#35C759",
+          confirmButtonText: "حسناً",
+          customClass: { popup: "font-['Cairo']" },
+        });
       } finally {
         setLoading(false);
       }
@@ -105,7 +114,14 @@ const PostReportPage = () => {
     e.preventDefault();
     
     if (!formData.teamLeader) {
-      alert("الرجاء اختيار رئيس الفريق قبل إرسال التقرير.");
+      Swal.fire({
+        title: "تنبيه",
+        text: "الرجاء اختيار رئيس الفريق قبل إرسال التقرير.",
+        icon: "warning",
+        confirmButtonColor: "#35C759",
+        confirmButtonText: "حسناً",
+        customClass: { popup: "font-['Cairo']" },
+      });
       return;
     }
 
@@ -114,16 +130,27 @@ const PostReportPage = () => {
     try {
       await reportService.createPostReport(formData);
 
-      alert("تم إرسال التقرير بنجاح إلى رئيس الفريق للمراجعة والاعتماد.");
+      await Swal.fire({
+        title: "عملية ناجحة",
+        text: "تم إرسال التقرير البعدي بنجاح إلى رئيس الفريق للمراجعة والاعتماد.",
+        icon: "success",
+        confirmButtonColor: "#35C759",
+        confirmButtonText: "استمرار",
+        customClass: { popup: "font-['Cairo']" },
+      });
       
       navigate(`/doctor/patient/${patientId}`);
       
     } catch (error) {
       console.error("Submit Error:", error);
-      alert(
-        error?.response?.data?.message ||
-        "حدث خطأ أثناء إرسال التقرير"
-      );
+      Swal.fire({
+        title: "خطأ",
+        text: error?.response?.data?.message || "حدث خطأ أثناء إرسال التقرير",
+        icon: "error",
+        confirmButtonColor: "#35C759",
+        confirmButtonText: "حسناً",
+        customClass: { popup: "font-['Cairo']" },
+      });
     } finally {
       setSaving(false);
     }
@@ -142,6 +169,10 @@ const PostReportPage = () => {
       dir="rtl"
       className="min-h-screen bg-gradient-to-b from-[#F6FCF9] to-white font-['Cairo',sans-serif] text-[15px] leading-[1.9] text-[#27343A]"
     >
+      <div>
+      <BackButton />
+      
+    </div>
       <div className="mx-auto my-10 w-full max-w-[1100px] px-5 md:px-10">
         
         {/* ================= LETTERHEAD ================= */}

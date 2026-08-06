@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
+
 import Logo from "../../components/auth/Logo";
 import SectionHeader from "../../components/auth/SectionHeader";
 import Input from "../../components/common/Input";
@@ -104,6 +105,7 @@ export default function Register() {
       <div className="mx-auto max-w-7xl px-8">
 
         <Logo />
+      
 
         <div className="mb-14 text-center">
           <h1 className="text-5xl font-extrabold text-slate-900">

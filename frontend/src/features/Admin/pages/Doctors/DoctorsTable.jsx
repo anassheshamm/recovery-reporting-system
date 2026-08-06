@@ -12,7 +12,7 @@ const DoctorsTable = ({ doctors = [] }) => {
             {/* <th className="px-8 py-6 text-right font-semibold">الدور</th> */}
             <th className="px-8 py-6 text-right font-semibold">البريد الإلكتروني</th>
             <th className="px-8 py-6 text-center font-semibold">الحالة</th>
-            <th className="px-8 py-6 text-center font-semibold">رؤية ملف المعالج</th>
+            {/* <th className="px-8 py-6 text-center font-semibold">رؤية ملف المعالج</th> */}
           </tr>
         </thead>
 

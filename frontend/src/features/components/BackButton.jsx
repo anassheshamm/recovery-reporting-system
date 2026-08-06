@@ -1,67 +1,35 @@
-import { useNavigate, useLocation } from "react-router-dom";
-import { ArrowRight, House } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight, Home } from "lucide-react";
 
-const BackButton = ({ showHome = false }) => {
+const BackButton = ({ label = "العودة للخلف", showHome = false, to, className = "" }) => {
   const navigate = useNavigate();
-  const location = useLocation();
 
-  // 1. List all the "Main" pages where the back button SHOULD NOT appear
-  const hideOnPages = [
-    "/",
-    "/admin",
-    "/admin/doctors",
-    "/admin/patients",
-    "/admin/heads",
-    "/doctor",
-    "/team-leader",
-    "/team-leader/doctors",
-    "/team-leader/patients",
-  ];
-
-  // 2. If the current URL is in the list above, don't render anything!
-  if (hideOnPages.includes(location.pathname)) {
-    return null;
-  }
-
-  const handleHome = () => {
-    if (location.pathname.startsWith("/doctor")) {
-      navigate("/doctor");
-    } else if (
-      location.pathname.startsWith("/team-leader")
-    ) {
-      navigate("/team-leader");
-    } else if (
-      location.pathname.startsWith("/admin")
-    ) {
-      navigate("/admin");
+  const handleNavigation = () => {
+    if (showHome) {
+      // If showHome is true, determine where "Home" is based on the user's role
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      if (user.role === "admin") navigate("/admin");
+      else if (user.role === "teamLeader") navigate("/team-leader");
+      else if (user.role === "doctor") navigate("/doctor");
+      else navigate("/");
+    } else if (to) {
+      // If a specific path is provided, go there
+      navigate(to);
+    } else {
+      // Default: Go back to the previous page in browser history
+      navigate(-1);
     }
   };
 
-  // 3. Otherwise, show the button(s)
   return (
-    <div className="mb-6 flex justify-between print:hidden">
-      {showHome ? (
-        <button
-          onClick={handleHome}
-          type="button"
-          className="flex w-fit items-center gap-2 rounded-xl bg-[#35C759] px-5 py-2.5 font-semibold text-white shadow-sm transition hover:bg-[#2FB350] active:scale-95"
-        >
-          <House size={20} />
-          <span>الرئيسية</span>
-        </button>
-      ) : (
-        <div />
-      )}
-
-      <button
-        onClick={() => navigate(-1)}
-        type="button"
-        className="flex w-fit items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 active:scale-95"
-      >
-        <ArrowRight size={20} className="text-[#35C759]" />
-        <span>رجوع</span>
-      </button>
-    </div>
+    <button
+      onClick={handleNavigation}
+      className={`mb-6 flex w-fit items-center gap-2 rounded-xl bg-gray-50 px-4 py-2.5 text-sm font-bold text-gray-600 shadow-sm transition-all hover:-translate-x-1 hover:bg-[#35C759] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#35C759]/20 active:scale-95 ${className}`}
+      dir="rtl"
+    >
+      {showHome ? <Home size={18} /> : <ArrowRight size={18} />}
+      <span>{showHome ? "العودة للرئيسية" : label}</span>
+    </button>
   );
 };
 

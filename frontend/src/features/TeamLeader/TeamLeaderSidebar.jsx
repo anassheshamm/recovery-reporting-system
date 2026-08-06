@@ -85,7 +85,7 @@ const TeamLeaderSidebar = () => {
           <h3 className="mb-6 text-lg font-bold text-[#1E7A5A]">إحصائيات الفريق</h3>
           <div className="space-y-5 text-base text-gray-600">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <span>أطباء الفريق</span>
+              <span>أعضاء الفريق</span>
               <span className="font-bold text-[#247C5A]">{stats.doctors}</span>
             </div>
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">

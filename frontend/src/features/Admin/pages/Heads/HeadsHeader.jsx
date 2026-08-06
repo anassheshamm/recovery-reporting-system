@@ -26,6 +26,7 @@ const HeadsHeader = ({ onDownload }) => {
           <Download size={18} />
           تنزيل اللائحة
         </button>
+        
       </div>
 
       <div className="mt-8 h-px bg-[#E5EFE9]" />
