@@ -15,7 +15,7 @@ const TeamDoctorsPage = () => {
 
   return (
     <div dir="rtl" className="mx-auto max-w-[1300px]">
-      <PageHeader title="أطباء الفريق" description="قائمة الأطباء والمرشدين المعينين تحت إشرافك" />
+      <PageHeader title="أعضاء الفريق" description="قائمة الأطباء والمرشدين المعينين تحت إشرافك" />
 
       {loading ? (
         <div className="py-20 text-center text-gray-500">جاري التحميل...</div>

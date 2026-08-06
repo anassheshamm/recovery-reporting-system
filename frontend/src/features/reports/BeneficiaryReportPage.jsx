@@ -3,6 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import userService from "../../services/user.service";
 import patientService from "../../services/patient.service";
 import reportService from "../../services/report.service";
+import BackButton from "../components/BackButton";
+import Swal from "sweetalert2";
+
 
 const BeneficiaryReportPage = () => {
   const { patientId } = useParams();
@@ -56,15 +59,20 @@ const BeneficiaryReportPage = () => {
       .catch((err) => console.error("Failed to load team leaders", err));
   }, [patientId]);
 
-  const loadPatient = async () => {
+const loadPatient = async () => {
     try {
       setLoading(true);
       const response = await patientService.getPatientById(patientId);
-      const actualPatient = response?.data?.patient || response?.patient || response;
-      setPatient(actualPatient);
+      setPatient(response?.data?.patient || response?.patient || response);
     } catch (error) {
-      console.error(error);
-      alert("فشل في تحميل بيانات المستفيد.");
+      Swal.fire({
+        title: "تنبيه",
+        text: "فشل في تحميل بيانات المستفيد.",
+        icon: "error",
+        confirmButtonColor: "#35C759",
+        confirmButtonText: "حسناً",
+        customClass: { popup: "font-['Cairo']" },
+      });
     } finally {
       setLoading(false);
     }
@@ -104,9 +112,15 @@ const BeneficiaryReportPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Prevent submission if no Team Leader is selected
     if (!formData.teamLeader) {
-      alert("الرجاء اختيار رئيس الفريق لاعتماد التقرير.");
+      Swal.fire({
+        title: "خطأ في الإدخال",
+        text: "الرجاء اختيار رئيس الفريق لاعتماد التقرير.",
+        icon: "warning",
+        confirmButtonColor: "#35C759",
+        confirmButtonText: "حسناً",
+        customClass: { popup: "font-['Cairo']" },
+      });
       return;
     }
 
@@ -138,14 +152,28 @@ const BeneficiaryReportPage = () => {
       },
     };
 
-    try {
+try {
       setSaving(true);
       await reportService.createPreReport(payload);
-      alert("تم إرسال التقرير القبلي بنجاح إلى رئيس الفريق للمراجعة والاعتماد.");
+      
+      await Swal.fire({
+        title: "عملية ناجحة",
+        text: "تم إرسال التقرير القبلي بنجاح إلى رئيس الفريق للمراجعة والاعتماد.",
+        icon: "success",
+        confirmButtonColor: "#35C759",
+        confirmButtonText: "استمرار",
+        customClass: { popup: "font-['Cairo']" },
+      });
       navigate(`/doctor/patient/${patientId}`);
     } catch (error) {
-      console.error(error);
-      alert(error?.response?.data?.message || "حدث خطأ أثناء إرسال التقرير.");
+      Swal.fire({
+        title: "خطأ",
+        text: error?.response?.data?.message || "حدث خطأ أثناء إرسال التقرير.",
+        icon: "error",
+        confirmButtonColor: "#35C759",
+        confirmButtonText: "حسناً",
+        customClass: { popup: "font-['Cairo']" },
+      });
     } finally {
       setSaving(false);
     }
@@ -161,10 +189,15 @@ const BeneficiaryReportPage = () => {
 
   return (
     <div dir="rtl" className="min-h-screen bg-gradient-to-b from-[#F6FCF9] to-white font-['Cairo',sans-serif] text-[15px] leading-[1.9] text-[#27343A]">
+      <div>
+      <BackButton />
+      
+    </div>
       <div className="mx-auto my-10 w-full max-w-[1100px] px-5 md:px-10">
 
         {/* ================= LETTERHEAD ================= */}
         <header className="rounded-[28px] border border-[#E7F0EB] bg-white/95 p-[28px] shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
+        
           <div className="mb-8 flex flex-wrap items-center justify-center gap-12">
             <img src="/logo.png" alt="Logo" className="h-16 object-contain" />
             <img src="/logo2.png" alt="Logo" className="h-16 object-contain" />

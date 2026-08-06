@@ -39,7 +39,7 @@ const DoctorRow = ({ doctor }) => {
         )}
       </td>
 
-      <td className="px-8 py-6">
+      {/* <td className="px-8 py-6">
         <div className="flex justify-center">
           <Link
             to={`/admin/doctors/${doctor._id}`}
@@ -49,7 +49,7 @@ const DoctorRow = ({ doctor }) => {
             <span className="font-medium">معاينة</span>
           </Link>
         </div>
-      </td>
+      </td> */}
     </tr>
   );
 };

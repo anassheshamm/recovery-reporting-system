@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { X, Loader2, Copy, CheckCircle, MailCheck } from "lucide-react";
 import api from "../../services/api";
+import Swal from "sweetalert2";
 
 const InviteMemberModal = ({ open, onClose, onSuccess }) => {
   const [email, setEmail] = useState("");

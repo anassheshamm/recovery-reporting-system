@@ -25,7 +25,7 @@ const HeadRow = ({ head }) => {
         {head.email || "-"}
       </td>
 
-      <td className="rounded-l-2xl px-6 py-5">
+      {/* <td className="rounded-l-2xl px-6 py-5">
         <div className="flex justify-center">
           <Link
             to={`/admin/heads/${head._id}`}
@@ -35,7 +35,7 @@ const HeadRow = ({ head }) => {
             <span className="font-medium">معاينة</span>
           </Link>
         </div>
-      </td>
+      </td> */}
     </tr>
   );
 };

@@ -16,6 +16,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import patientService from "../../services/patient.service";
+import Swal from "sweetalert2";
 
 const PatientProfilePage = () => {
   const navigate = useNavigate();
@@ -82,10 +83,47 @@ const PatientProfilePage = () => {
     }
   };
 
-  const handleDeletePatient = () => {
-    alert(
-      "حذف المستفيد غير متوفر حالياً لأن الـ Backend لا يحتوي على Delete Patient API."
-    );
+  const handleDeletePatient = async () => {
+    // 1. SweetAlert Confirmation
+    const result = await Swal.fire({
+      title: "هل أنت متأكد؟",
+      text: "لن تتمكن من استرجاع بيانات هذا المستفيد بعد الحذف!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#35C759",
+      confirmButtonText: "نعم، احذف المستفيد",
+      cancelButtonText: "إلغاء",
+      customClass: { popup: "font-['Cairo']" },
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await patientService.deletePatient(patientId);
+        
+        // 2. SweetAlert Success
+        Swal.fire({
+          title: "تم الحذف!",
+          text: "تم حذف بيانات المستفيد بنجاح.",
+          icon: "success",
+          confirmButtonColor: "#35C759",
+          confirmButtonText: "حسناً",
+          customClass: { popup: "font-['Cairo']" },
+        });
+        
+        navigate(-1);
+      } catch (err) {
+        // 3. SweetAlert Error
+        Swal.fire({
+          title: "خطأ!",
+          text: err.response?.data?.message || "حدث خطأ أثناء محاولة حذف المستفيد.",
+          icon: "error",
+          confirmButtonColor: "#35C759",
+          confirmButtonText: "حسناً",
+          customClass: { popup: "font-['Cairo']" },
+        });
+      }
+    }
   };
 
 
