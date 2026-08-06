@@ -17,9 +17,17 @@ import { useNavigate, useParams } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import patientService from "../../services/patient.service";
 import Swal from "sweetalert2";
+import { useLocation } from "react-router-dom";
 
 const PatientProfilePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+const basePath = location.pathname.startsWith("/admin")
+  ? "/admin"
+  : location.pathname.startsWith("/team-leader")
+  ? "/team-leader"
+  : "/doctor";
   const { patientId } = useParams();
 
   const [loading, setLoading] = useState(true);
@@ -54,7 +62,7 @@ const PatientProfilePage = () => {
         ...r,
         reportType: "قبلي", // Pre
         programName: r.reportInformation?.programName,
-        viewLink: `/doctor/pre-reports/${r._id}`
+        viewLink: `${basePath}/pre-reports/${r._id}`
       }));
 
       // Format Post-Reports
@@ -62,7 +70,7 @@ const PatientProfilePage = () => {
         ...r,
         reportType: "بعدي", // Post
         programName: r.beneficiaryInformation?.programName,
-        viewLink: `/doctor/post-reports/${r._id}`
+        viewLink: `${basePath}/post-reports/${r._id}`
       }));
 
       // Combine both arrays and sort chronologically (newest first)
@@ -685,7 +693,7 @@ const PatientProfilePage = () => {
                   setIsReportModalOpen(false);
 
                   navigate(
-                    `/doctor/reports/secondary/${patient._id}`
+                    `${basePath}/reports/secondary/${patient._id}`
                   );
                 }}
                 className="
