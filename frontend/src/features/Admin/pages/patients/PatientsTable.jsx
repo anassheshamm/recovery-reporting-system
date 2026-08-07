@@ -23,7 +23,7 @@ const PatientsTable = ({ patients = [] }) => {
               المعالج المشرف
             </th>
             <th className="rounded-l-2xl px-6 py-5 text-center font-semibold">
-              رؤية ملف المريض
+            رؤية ملف المستفيد
             </th>
           </tr>
         </thead>

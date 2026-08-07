@@ -29,9 +29,7 @@ const HeadsTable = ({ heads = [] }) => {
 
             {/* Removed Department column */}
 
-            <th className="rounded-l-2xl px-6 py-5 text-center font-semibold">
-              رؤية الملف
-            </th>
+
           </tr>
         </thead>
 

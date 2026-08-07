@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/Sidebar";
-import BackButton from "../../components/BackButton";
+
 
 const menu = [
   {
@@ -23,7 +23,7 @@ const AdminLayout = () => {
     <div dir="ltr" className="min-h-screen bg-[#FCFEFD]">
       <div className="flex">
         {/* Main Content */}
-        <BackButton />
+        
         <main className="flex-1 px-10 py-8">
           <Outlet />
         </main>
