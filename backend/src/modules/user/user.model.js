@@ -67,6 +67,11 @@ const userSchema = new mongoose.Schema(
       default: true,
     },
 
+    canInviteUsers: {
+  type: Boolean,
+  default: false,
+},
+
     lastLogin: {
       type: Date,
       default: null,
