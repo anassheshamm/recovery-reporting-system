@@ -18,11 +18,12 @@ import BackButton from "../components/BackButton";
 import patientService from "../../services/patient.service";
 import Swal from "sweetalert2";
 import { useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const PatientProfilePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
+const { user } = useAuth();
 const basePath = location.pathname.startsWith("/admin")
   ? "/admin"
   : location.pathname.startsWith("/team-leader")
@@ -538,12 +539,14 @@ const basePath = location.pathname.startsWith("/admin")
                 <p className="mt-1 text-gray-500">سجل التقارير القبلية والبعدية</p>
               </div>
             </div>
-            <button
-              onClick={() => setIsReportModalOpen(true)}
-              className="flex items-center gap-2 rounded-xl bg-[#35C759] px-6 py-3 font-semibold text-white transition hover:bg-[#2FB350]"
-            >
-              <Plus size={18} /> إضافة تقرير
-            </button>
+            {user?.role === "doctor" && (
+  <button
+    onClick={() => setIsReportModalOpen(true)}
+    className="flex items-center gap-2 rounded-xl bg-[#35C759] px-6 py-3 font-semibold text-white transition hover:bg-[#2FB350]"
+  >
+    <Plus size={18} /> إضافة تقرير
+  </button>
+)}
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
