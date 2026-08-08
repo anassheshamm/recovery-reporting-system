@@ -40,8 +40,9 @@ class PostReportService {
     // ============================================================
 
     const preReport = await PreReport.findOne({
-      patient: patient._id,
-    });
+  patient: patient._id,
+  "approval.status": "approved",
+});
 
     if (!preReport) {
       throw new AppError(
@@ -61,16 +62,17 @@ class PostReportService {
     // Prevent Duplicate
     // ============================================================
 
-    const existingReport = await PostReport.findOne({
-      patient: patient._id,
-    });
+   const existingReport = await PostReport.findOne({
+  patient: patient._id,
+  "approval.status": { $ne: "rejected" },
+});
 
-    if (existingReport) {
-      throw new AppError(
-        "A post-report already exists for this patient.",
-        409
-      );
-    }
+if (existingReport) {
+  throw new AppError(
+    "A post-report already exists for this patient.",
+    409
+  );
+}
 
     // ============================================================
     // Create Report
