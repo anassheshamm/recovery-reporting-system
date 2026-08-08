@@ -2,15 +2,27 @@ import { useEffect, useState } from "react";
 import PageHeader from "../components/PageHeader";
 import PatientsTable from "./PatientsTable";
 import patientService from "../../services/patient.service";
+import { useSearch } from "../../context/SearchContext";
 
-const DoctorsPage = ({ searchQuery = "" }) => {
+const DoctorsPage = () => {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // 1. Get the search term from context
+  const { searchTerm } = useSearch();
+
+  // DEBUG LOG 1: Check if the context is updating when you type
+  console.log("Current Search Term on Page:", searchTerm);
+
+  // 2. Trigger fetch when searchTerm changes (with a 500ms delay)
   useEffect(() => {
-    loadPatients();
-  }, []);
+    const delayDebounceFn = setTimeout(() => {
+      loadPatients();
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
 
   const calculateAge = (birthDate) => {
     if (!birthDate) return "-";
@@ -24,54 +36,67 @@ const DoctorsPage = ({ searchQuery = "" }) => {
     return age;
   };
 
- const loadPatients = async () => {
-  try {
-    setLoading(true);
-    setError("");
+  const loadPatients = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-    const response = await patientService.getAllPatients();
+      // DEBUG LOG 2: Check exactly what is being sent to the API
+      console.log("Sending to API:", searchTerm);
 
-    console.log("Response:", response);
-    console.log("Response.data:", response.data);
-    console.log("Is Array:", Array.isArray(response.data));
+      // 3. Fetch from backend using the search term
+      const response = await patientService.getAllPatients(searchTerm);
+      const rawPatients = response.data || [];
 
-    const rawPatients = response.data || [];
+      // 4. MAP THE DATA! (This is what makes the table display correctly)
+      const mappedPatients = rawPatients.map((patient) => ({
+        _id: patient._id,
+        fullName: [patient.firstName, patient.middleName, patient.lastName]
+          .filter(Boolean)
+          .join(" "),
+        age: calculateAge(patient.dateOfBirth),
+        nationalId: patient.nationalId || "-",
+        phone: patient.phone || "-",
+        email: patient.email || "-",
+        joinDate: patient.createdAt
+          ? new Date(patient.createdAt).toLocaleDateString("en-GB")
+          : "-",
+      }));
 
-    const mappedPatients = rawPatients.map((patient) => ({
-      _id: patient._id,
-      fullName: [patient.firstName, patient.middleName, patient.lastName]
-        .filter(Boolean)
-        .join(" "),
-      age: calculateAge(patient.dateOfBirth),
-      nationalId: patient.nationalId || "-",
-      phone: patient.phone || "-",
-      email: patient.email || "-",
-      joinDate: patient.createdAt
-        ? new Date(patient.createdAt).toLocaleDateString("en-GB")
-        : "-",
-    }));
+      // 5. Save the properly formatted data to state
+      setPatients(mappedPatients);
+    } catch (err) {
+      console.error("ERROR:", err);
+      setError(
+        err.response?.data?.message || "حدث خطأ أثناء تحميل المستفيدين"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+   const handleDownload = () => {
+    if (!patients.length) return;
+    
+    const headers = ["الاسم", "رقم الهوية", "الهاتف", "البريد الإلكتروني"];
+    const rows = patients.map((p) => [
+      `${p.firstName || ""} ${p.lastName || ""}`.trim(),
+      p.nationalId || "",
+      p.phone || "",
+      p.email || "",
+    ]);
 
-    setPatients(mappedPatients);
-  } catch (err) {
-    console.error("ERROR:", err);
-    console.error("RESPONSE:", err.response);
+    const csvContent =
+      "data:text/csv;charset=utf-8,\uFEFF" +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
 
-    setError(
-      err.response?.data?.message || "حدث خطأ أثناء تحميل المستفيدين"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-
-  const filteredPatients = patients.filter((p) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      p.fullName.toLowerCase().includes(q) ||
-      (p.nationalId && p.nationalId.includes(q))
-    );
-  });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "patients_list.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="mx-auto max-w-[1300px]">
@@ -79,6 +104,8 @@ const DoctorsPage = ({ searchQuery = "" }) => {
         title="لائحة المستفيدين"
         description="عرض وإدارة جميع ملفات المستفيدين الخاصة بالمركز"
         downloadText="تنزيل لائحة المستفيدين"
+        onDownload={handleDownload}
+
       />
 
       {loading ? (
@@ -90,7 +117,7 @@ const DoctorsPage = ({ searchQuery = "" }) => {
           {error}
         </div>
       ) : (
-        <PatientsTable patients={filteredPatients} />
+        <PatientsTable patients={patients} />
       )}
     </div>
   );

@@ -2,10 +2,11 @@ import api from "./api";
 
 const patientService = {
   // ===========================
-  // Get All Patients (Original)
+  // Get All Patients (With Search)
   // ===========================
-  async getAllPatients() {
-    const response = await api.get("/patients");
+  async getAllPatients(search = "") {
+    const queryString = search ? `?search=${search}` : "";
+    const response = await api.get(`/patients${queryString}`);
     return response.data;
   },
 
@@ -95,4 +96,4 @@ const patientService = {
   },
 };
 
-export default patientService;
+export default patientService;   

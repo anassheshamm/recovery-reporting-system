@@ -167,24 +167,25 @@ const PostReportPage = () => {
   return (
     <div
       dir="rtl"
-      className="min-h-screen bg-gradient-to-b from-[#F6FCF9] to-white font-['Cairo',sans-serif] text-[15px] leading-[1.9] text-[#27343A]"
+      className="min-h-screen bg-gradient-to-b from-[#F6FCF9] to-white font-['Cairo',sans-serif] text-[15px] leading-[1.9] text-[#27343A] print:bg-white"
     >
-      <div>
-      <BackButton />
-      
-    </div>
-      <div className="mx-auto my-10 w-full max-w-[1100px] px-5 md:px-10">
+      {/* BackButton hidden on print */}
+      <div className="print:hidden">
+        <BackButton />
+      </div>
+
+      <div className="mx-auto my-10 w-full max-w-[1100px] px-5 md:px-10 print:my-0 print:max-w-none print:px-0">
         
         {/* ================= LETTERHEAD ================= */}
-        <header className="rounded-[28px] border border-[#E7F0EB] bg-white/95 p-[28px] shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
-          <div className="mb-8 flex flex-wrap items-center justify-center gap-12">
+        <header className="rounded-[28px] border border-[#E7F0EB] bg-white/95 p-[28px] shadow-[0_10px_35px_rgba(30,122,90,0.08)] print:border-none print:shadow-none print:p-0">
+          <div className="mb-8 flex flex-wrap items-center justify-center gap-12 print:mb-4">
             <img src="/logo.png" alt="Logo" className="h-16 object-contain" />
             <img src="/logo2.png" alt="Logo" className="h-16 object-contain" />
           </div>
 
-          <div className="my-6 h-[2px] w-full bg-gradient-to-r from-transparent via-[#34C759] to-transparent" />
+          <div className="my-6 h-[2px] w-full bg-gradient-to-r from-transparent via-[#34C759] to-transparent print:bg-[#34C759]" />
 
-          <div className="flex flex-col justify-between gap-6 md:flex-row">
+          <div className="flex flex-col justify-between gap-6 md:flex-row print:flex-row print:items-center">
             <div>
               <h1 className="text-3xl font-bold text-[#1E7A5A]">
                 التقرير البعدي
@@ -199,92 +200,92 @@ const PostReportPage = () => {
           </div>
         </header>
 
-        <form onSubmit={handleSubmit} className="mt-10">
+        <form onSubmit={handleSubmit} className="mt-10 print:mt-6">
           
           {/* ================= 1. PATIENT & PROGRAM INFO ================= */}
-          <section className="mt-12">
-            <div className="mb-6 flex items-center gap-4">
+          <section className="mt-12 print:mt-6 print:break-inside-avoid">
+            <div className="mb-6 flex items-center gap-4 print:mb-2">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#EAF5F0] font-bold text-[#1E7A5A]">
                 1
               </span>
               <h2 className="text-2xl font-bold text-[#1E7A5A]">البيانات الأساسية</h2>
             </div>
 
-            <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
-              <div className="grid grid-cols-1 gap-7 md:grid-cols-2">
+            <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)] print:border-gray-200 print:shadow-none print:p-4">
+              <div className="grid grid-cols-1 gap-7 md:grid-cols-2 print:gap-4">
                 
                 {/* Beneficiary Name (Auto-filled) */}
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 print:gap-1">
                   <label className="font-semibold text-[#1E7A5A]">اسم المستفيد</label>
                   <input
                     type="text"
                     value={patient ? `${patient.firstName || ""} ${patient.middleName || ""} ${patient.lastName || ""}` : ""}
                     readOnly
-                    className="w-full rounded-xl border border-[#E7F0EB] bg-gray-100 px-5 py-4 text-gray-600 outline-none"
+                    className="w-full rounded-xl border border-[#E7F0EB] bg-gray-100 px-5 py-4 text-gray-600 outline-none print:bg-white print:border-gray-300 print:py-2"
                   />
                 </div>
 
                 {/* National ID (Auto-filled) */}
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 print:gap-1">
                   <label className="font-semibold text-[#1E7A5A]">رقم الهوية</label>
                   <input
                     type="text"
                     value={patient?.nationalId || ""}
                     readOnly
-                    className="w-full rounded-xl border border-[#E7F0EB] bg-gray-100 px-5 py-4 text-gray-600 outline-none"
+                    className="w-full rounded-xl border border-[#E7F0EB] bg-gray-100 px-5 py-4 text-gray-600 outline-none print:bg-white print:border-gray-300 print:py-2"
                   />
                 </div>
 
                 {/* Program Name */}
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 print:gap-1">
                   <label className="font-semibold text-[#1E7A5A]">اسم البرنامج</label>
                   <input
                     type="text"
                     value={formData.beneficiaryInformation.programName}
                     onChange={(e) => handleNestedChange("beneficiaryInformation", "programName", e.target.value)}
                     placeholder="اسم البرنامج"
-                    className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
+                    className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759] print:bg-white print:border-gray-300 print:py-2"
                     required
                   />
                 </div>
 
                 {/* Counselor Name */}
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 print:gap-1">
                   <label className="font-semibold text-[#1E7A5A]">اسم المرشد</label>
                   <input
                     type="text"
                     value={formData.beneficiaryInformation.counselorName}
                     onChange={(e) => handleNestedChange("beneficiaryInformation", "counselorName", e.target.value)}
                     placeholder="اسم المرشد"
-                    className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
+                    className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759] print:bg-white print:border-gray-300 print:py-2"
                     required
                   />
                 </div>
 
                 {/* Dates */}
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 print:gap-1">
                   <label className="font-semibold text-[#1E7A5A]">تاريخ البدء</label>
                   <input
                     type="date"
                     value={formData.beneficiaryInformation.startDate}
                     onChange={(e) => handleNestedChange("beneficiaryInformation", "startDate", e.target.value)}
-                    className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
+                    className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759] print:bg-white print:border-gray-300 print:py-2"
                     required
                   />
                 </div>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 print:gap-1">
                   <label className="font-semibold text-[#1E7A5A]">تاريخ التخرج</label>
                   <input
                     type="date"
                     value={formData.beneficiaryInformation.graduationDate}
                     onChange={(e) => handleNestedChange("beneficiaryInformation", "graduationDate", e.target.value)}
-                    className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
+                    className="w-full rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759] print:bg-white print:border-gray-300 print:py-2"
                     required
                   />
                 </div>
 
                 {/* Team Leader Dropdown */}
-                <div className="flex flex-col gap-3 md:col-span-2">
+                <div className="flex flex-col gap-3 md:col-span-2 print:gap-1 print:hidden">
                   <label className="font-semibold text-[#1E7A5A]">رئيس الفريق (للاعتماد)</label>
                   <select
                     name="teamLeader"
@@ -307,37 +308,37 @@ const PostReportPage = () => {
           </section>
 
           {/* ================= 2. CASE SUMMARY ================= */}
-          <section className="mt-12">
-            <div className="mb-6 flex items-center gap-4">
+          <section className="mt-12 print:mt-6 print:break-inside-avoid">
+            <div className="mb-6 flex items-center gap-4 print:mb-2">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#EAF5F0] font-bold text-[#1E7A5A]">
                 2
               </span>
               <h2 className="text-2xl font-bold text-[#1E7A5A]">ملخص الحالة المتعلق بتعديل الوضع</h2>
             </div>
 
-            <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
-              <div className="flex flex-col gap-3">
+            <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)] print:border-gray-200 print:shadow-none print:p-4">
+              <div className="flex flex-col gap-3 print:gap-1">
                 <label className="font-semibold text-[#1E7A5A]">ملخص الحالة</label>
                 <textarea
                   value={formData.caseSummary.summary}
                   onChange={(e) => handleNestedChange("caseSummary", "summary", e.target.value)}
                   placeholder="اكتب ملخص الحالة..."
-                  className="min-h-[170px] w-full resize-y rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
+                  className="min-h-[170px] w-full resize-y rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759] print:bg-white print:border-gray-300 print:min-h-[80px]"
                   required
                 />
               </div>
 
-              <div className="my-8 h-[1px] w-full bg-[#E7F0EB]"></div>
+              <div className="my-8 h-[1px] w-full bg-[#E7F0EB] print:my-4"></div>
 
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 print:gap-1">
                 <label className="font-semibold text-[#1E7A5A]">شدة الإدمان</label>
-                <div className="flex flex-wrap gap-4 mt-2">
+                <div className="flex flex-wrap gap-4 mt-2 print:gap-2">
                   {[
                     { label: "خفيفة", val: "mild" },
                     { label: "متوسطة", val: "moderate" },
                     { label: "شديدة", val: "severe" }
                   ].map((option) => (
-                    <label key={option.val} className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] bg-[#F8FCFA] px-5 py-3 transition hover:bg-[#F2FBF5] hover:border-[#34C759]">
+                    <label key={option.val} className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] bg-[#F8FCFA] px-5 py-3 transition hover:bg-[#F2FBF5] hover:border-[#34C759] print:bg-white print:border-gray-300 print:px-3 print:py-1">
                       <input
                         type="radio"
                         value={option.val}
@@ -355,24 +356,24 @@ const PostReportPage = () => {
           </section>
 
           {/* ================= 3. PROGRESS ASSESSMENT ================= */}
-          <section className="mt-12">
-            <div className="mb-6 flex items-center gap-4">
+          <section className="mt-12 print:mt-6 print:break-inside-avoid">
+            <div className="mb-6 flex items-center gap-4 print:mb-2">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#EAF5F0] font-bold text-[#1E7A5A]">
                 3
               </span>
               <h2 className="text-2xl font-bold text-[#1E7A5A]">قياس التقدم في الجوانب التالية</h2>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 print:gap-4">
               {/* Psychological */}
-              <div className="rounded-[20px] border border-[#E7F0EB] bg-white p-7 shadow-[0_8px_24px_rgba(30,122,90,0.05)] transition hover:-translate-y-1 hover:border-[#34C759]/30 hover:shadow-[0_18px_40px_rgba(30,122,90,0.12)]">
-                <h3 className="mb-6 border-b border-[#E7F0EB] pb-4 text-center text-lg font-bold text-[#1E7A5A]">1- الجانب النفسي</h3>
+              <div className="rounded-[20px] border border-[#E7F0EB] bg-white p-7 shadow-[0_8px_24px_rgba(30,122,90,0.05)] print:border-gray-200 print:shadow-none print:p-4">
+                <h3 className="mb-6 border-b border-[#E7F0EB] pb-4 text-center text-lg font-bold text-[#1E7A5A] print:mb-2 print:pb-2">1- الجانب النفسي</h3>
                 {[
                   { label: "تحسن ملحوظ", val: "significant_improvement" },
                   { label: "تحسن متوسط", val: "moderate_improvement" },
                   { label: "لا يوجد تحسن", val: "no_improvement" }
                 ].map((opt) => (
-                  <label key={opt.val} className="mb-3 flex w-full cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] bg-white px-4 py-3 transition hover:bg-[#F4FCF7] hover:border-[#34C759]">
+                  <label key={opt.val} className="mb-3 flex w-full cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] bg-white px-4 py-3 transition hover:bg-[#F4FCF7] hover:border-[#34C759] print:border-gray-200 print:p-2 print:mb-1">
                     <input type="radio" value={opt.val} checked={formData.progressAssessment.psychologicalStatus === opt.val} onChange={(e) => handleNestedChange("progressAssessment", "psychologicalStatus", e.target.value)} className="accent-[#34C759] h-[18px] w-[18px]" required />
                     <span>{opt.label}</span>
                   </label>
@@ -380,14 +381,14 @@ const PostReportPage = () => {
               </div>
 
               {/* Behavioral */}
-              <div className="rounded-[20px] border border-[#E7F0EB] bg-white p-7 shadow-[0_8px_24px_rgba(30,122,90,0.05)] transition hover:-translate-y-1 hover:border-[#34C759]/30 hover:shadow-[0_18px_40px_rgba(30,122,90,0.12)]">
-                <h3 className="mb-6 border-b border-[#E7F0EB] pb-4 text-center text-lg font-bold text-[#1E7A5A]">2- الجانب السلوكي</h3>
+              <div className="rounded-[20px] border border-[#E7F0EB] bg-white p-7 shadow-[0_8px_24px_rgba(30,122,90,0.05)] print:border-gray-200 print:shadow-none print:p-4">
+                <h3 className="mb-6 border-b border-[#E7F0EB] pb-4 text-center text-lg font-bold text-[#1E7A5A] print:mb-2 print:pb-2">2- الجانب السلوكي</h3>
                 {[
                   { label: "التزام عالي", val: "high_commitment" },
                   { label: "التزام متوسط", val: "medium_commitment" },
                   { label: "صعوبة في الالتزام", val: "difficulty_commitment" }
                 ].map((opt) => (
-                  <label key={opt.val} className="mb-3 flex w-full cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] bg-white px-4 py-3 transition hover:bg-[#F4FCF7] hover:border-[#34C759]">
+                  <label key={opt.val} className="mb-3 flex w-full cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] bg-white px-4 py-3 transition hover:bg-[#F4FCF7] hover:border-[#34C759] print:border-gray-200 print:p-2 print:mb-1">
                     <input type="radio" value={opt.val} checked={formData.progressAssessment.behavioralStatus === opt.val} onChange={(e) => handleNestedChange("progressAssessment", "behavioralStatus", e.target.value)} className="accent-[#34C759] h-[18px] w-[18px]" required />
                     <span>{opt.label}</span>
                   </label>
@@ -395,14 +396,14 @@ const PostReportPage = () => {
               </div>
 
               {/* Social */}
-              <div className="rounded-[20px] border border-[#E7F0EB] bg-white p-7 shadow-[0_8px_24px_rgba(30,122,90,0.05)] transition hover:-translate-y-1 hover:border-[#34C759]/30 hover:shadow-[0_18px_40px_rgba(30,122,90,0.12)]">
-                <h3 className="mb-6 border-b border-[#E7F0EB] pb-4 text-center text-lg font-bold text-[#1E7A5A]">3- الجانب الاجتماعي</h3>
+              <div className="rounded-[20px] border border-[#E7F0EB] bg-white p-7 shadow-[0_8px_24px_rgba(30,122,90,0.05)] print:border-gray-200 print:shadow-none print:p-4">
+                <h3 className="mb-6 border-b border-[#E7F0EB] pb-4 text-center text-lg font-bold text-[#1E7A5A] print:mb-2 print:pb-2">3- الجانب الاجتماعي</h3>
                 {[
                   { label: "تفاعل إيجابي", val: "positive_interaction" },
                   { label: "تفاعل محدود", val: "limited_interaction" },
                   { label: "عزلة اجتماعية", val: "social_isolation" }
                 ].map((opt) => (
-                  <label key={opt.val} className="mb-3 flex w-full cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] bg-white px-4 py-3 transition hover:bg-[#F4FCF7] hover:border-[#34C759]">
+                  <label key={opt.val} className="mb-3 flex w-full cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] bg-white px-4 py-3 transition hover:bg-[#F4FCF7] hover:border-[#34C759] print:border-gray-200 print:p-2 print:mb-1">
                     <input type="radio" value={opt.val} checked={formData.progressAssessment.socialStatus === opt.val} onChange={(e) => handleNestedChange("progressAssessment", "socialStatus", e.target.value)} className="accent-[#34C759] h-[18px] w-[18px]" required />
                     <span>{opt.label}</span>
                   </label>
@@ -412,15 +413,15 @@ const PostReportPage = () => {
           </section>
 
           {/* ================= 4. PROGRAM PROGRESS ================= */}
-          <section className="mt-12">
-            <div className="mb-6 flex items-center gap-4">
+          <section className="mt-12 print:mt-6 print:break-inside-avoid">
+            <div className="mb-6 flex items-center gap-4 print:mb-2">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#EAF5F0] font-bold text-[#1E7A5A]">
                 4
               </span>
               <h2 className="text-2xl font-bold text-[#1E7A5A]">مدى تقدم المتعافي في البرنامج</h2>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 print:gap-4">
               {[
                 { field: "overallImprovement", title: "1- التحسن العام", opts: [{l:"ملحوظ جداً", v:"excellent"}, {l:"جيد", v:"good"}, {l:"محدود", v:"limited"}] },
                 { field: "treatmentCommitment", title: "2- مدى الالتزام بالخطة العلاجية", opts: [{l:"ملتزم تماماً", v:"fully_committed"}, {l:"ملتزم جزئياً", v:"partially_committed"}, {l:"غير ملتزم", v:"not_committed"}] },
@@ -429,10 +430,10 @@ const PostReportPage = () => {
                 { field: "familyRelationship", title: "5- العلاقة مع الأسرة", opts: [{l:"تحسنت", v:"improved"}, {l:"لا تتغير", v:"unchanged"}, {l:"لا تزال متوترة", v:"still_tense"}] },
                 { field: "communityReadiness", title: "6- الاستعداد للاندماج بالمجتمع", opts: [{l:"جاهز", v:"ready"}, {l:"يحتاج دعم إضافي", v:"needs_support"}, {l:"غير مستعد حالياً", v:"not_ready"}] },
               ].map((card) => (
-                <div key={card.field} className="rounded-[20px] border border-[#E7F0EB] bg-white p-7 shadow-[0_8px_24px_rgba(30,122,90,0.05)] transition hover:-translate-y-1 hover:border-[#34C759]/30 hover:shadow-[0_18px_40px_rgba(30,122,90,0.12)]">
-                  <h3 className="mb-6 border-b border-[#E7F0EB] pb-4 text-center text-lg font-bold text-[#1E7A5A]">{card.title}</h3>
+                <div key={card.field} className="rounded-[20px] border border-[#E7F0EB] bg-white p-7 shadow-[0_8px_24px_rgba(30,122,90,0.05)] print:border-gray-200 print:shadow-none print:p-4">
+                  <h3 className="mb-6 border-b border-[#E7F0EB] pb-4 text-center text-lg font-bold text-[#1E7A5A] print:mb-2 print:pb-2">{card.title}</h3>
                   {card.opts.map((opt) => (
-                    <label key={opt.v} className="mb-3 flex w-full cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] bg-white px-4 py-3 transition hover:bg-[#F4FCF7] hover:border-[#34C759]">
+                    <label key={opt.v} className="mb-3 flex w-full cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] bg-white px-4 py-3 transition hover:bg-[#F4FCF7] hover:border-[#34C759] print:border-gray-200 print:p-2 print:mb-1">
                       <input type="radio" value={opt.v} checked={formData.programProgress[card.field] === opt.v} onChange={(e) => handleNestedChange("programProgress", card.field, e.target.value)} className="accent-[#34C759] h-[18px] w-[18px]" required />
                       <span>{opt.l}</span>
                     </label>
@@ -443,19 +444,19 @@ const PostReportPage = () => {
           </section>
 
           {/* ================= 5. STABILITY ================= */}
-          <section className="mt-12">
-            <div className="mb-6 flex items-center gap-4">
+          <section className="mt-12 print:mt-6 print:break-inside-avoid">
+            <div className="mb-6 flex items-center gap-4 print:mb-2">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#EAF5F0] font-bold text-[#1E7A5A]">5</span>
               <h2 className="text-2xl font-bold text-[#1E7A5A]">مدى قدرة المتعافي على الاستقرار بدون انتكاسة</h2>
             </div>
-            <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
-              <div className="flex flex-wrap gap-4">
+            <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)] print:border-gray-200 print:shadow-none print:p-4">
+              <div className="flex flex-wrap gap-4 print:gap-2">
                 {[
                   { label: "جيد جداً", val: "very_good" },
                   { label: "مقبول", val: "acceptable" },
                   { label: "ضعيف", val: "weak" }
                 ].map((opt) => (
-                  <label key={opt.val} className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] bg-[#F8FCFA] px-5 py-3 transition hover:bg-[#F2FBF5] hover:border-[#34C759]">
+                  <label key={opt.val} className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] bg-[#F8FCFA] px-5 py-3 transition hover:bg-[#F2FBF5] hover:border-[#34C759] print:bg-white print:border-gray-300 print:px-3 print:py-1">
                     <input type="radio" value={opt.val} checked={formData.recoveryStability === opt.val} onChange={(e) => handleFlatChange("recoveryStability", e.target.value)} className="accent-[#34C759] h-5 w-5" required />
                     <span>{opt.label}</span>
                   </label>
@@ -465,19 +466,19 @@ const PostReportPage = () => {
           </section>
 
           {/* ================= 6. FUTURE PLAN ================= */}
-          <section className="mt-12">
-            <div className="mb-6 flex items-center gap-4">
+          <section className="mt-12 print:mt-6 print:break-inside-avoid">
+            <div className="mb-6 flex items-center gap-4 print:mb-2">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#EAF5F0] font-bold text-[#1E7A5A]">6</span>
               <h2 className="text-2xl font-bold text-[#1E7A5A]">استعداد المتعافي لوضع خطة شخصية لما بعد البرنامج</h2>
             </div>
-            <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
-              <div className="flex flex-wrap gap-4">
+            <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)] print:border-gray-200 print:shadow-none print:p-4">
+              <div className="flex flex-wrap gap-4 print:gap-2">
                 {[
                   { label: "جاهز", val: "ready" },
                   { label: "قيد التطوير", val: "under_development" },
                   { label: "غير مستعد", val: "not_ready" }
                 ].map((opt) => (
-                  <label key={opt.val} className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] bg-[#F8FCFA] px-5 py-3 transition hover:bg-[#F2FBF5] hover:border-[#34C759]">
+                  <label key={opt.val} className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#E7F0EB] bg-[#F8FCFA] px-5 py-3 transition hover:bg-[#F2FBF5] hover:border-[#34C759] print:bg-white print:border-gray-300 print:px-3 print:py-1">
                     <input type="radio" value={opt.val} checked={formData.personalPlanReadiness === opt.val} onChange={(e) => handleFlatChange("personalPlanReadiness", e.target.value)} className="accent-[#34C759] h-5 w-5" required />
                     <span>{opt.label}</span>
                   </label>
@@ -487,60 +488,61 @@ const PostReportPage = () => {
           </section>
 
           {/* ================= 7. FAMILY NOTIFICATION ================= */}
-          <section className="mt-12">
-            <div className="mb-6 flex items-center gap-4">
+          <section className="mt-12 print:mt-6 print:break-inside-avoid">
+            <div className="mb-6 flex items-center gap-4 print:mb-2">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#EAF5F0] font-bold text-[#1E7A5A]">7</span>
               <h2 className="text-2xl font-bold text-[#1E7A5A]">إشعار الأسرة والعمل خلال فترة التعافي</h2>
             </div>
-            <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
-              <div className="flex flex-col gap-3">
+            <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)] print:border-gray-200 print:shadow-none print:p-4">
+              <div className="flex flex-col gap-3 print:gap-1">
                 <label className="font-semibold text-[#1E7A5A]">ملاحظات</label>
                 <textarea
                   value={formData.familyNotification.notes}
                   onChange={(e) => handleNestedChange("familyNotification", "notes", e.target.value)}
                   placeholder="اكتب الملاحظات المتعلقة بإشعار الأسرة أو جهة العمل..."
-                  className="min-h-[170px] w-full resize-y rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
+                  className="min-h-[170px] w-full resize-y rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759] print:bg-white print:border-gray-300 print:min-h-[80px]"
                 />
               </div>
             </div>
           </section>
 
           {/* ================= 8. RECOMMENDATIONS ================= */}
-          <section className="mt-12">
-            <div className="mb-6 flex items-center gap-4">
+          <section className="mt-12 print:mt-6 print:break-inside-avoid">
+            <div className="mb-6 flex items-center gap-4 print:mb-2">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#EAF5F0] font-bold text-[#1E7A5A]">8</span>
               <h2 className="text-2xl font-bold text-[#1E7A5A]">توصيات المرشد</h2>
             </div>
-            <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
-              <div className="flex flex-col gap-3">
+            <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)] print:border-gray-200 print:shadow-none print:p-4">
+              <div className="flex flex-col gap-3 print:gap-1">
                 <label className="font-semibold text-[#1E7A5A]">التوصيات</label>
                 <textarea
                   value={formData.recommendations}
                   onChange={(e) => handleFlatChange("recommendations", e.target.value)}
                   placeholder="اكتب توصيات المرشد..."
-                  className="min-h-[170px] w-full resize-y rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
+                  className="min-h-[170px] w-full resize-y rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759] print:bg-white print:border-gray-300 print:min-h-[80px]"
                 />
               </div>
             </div>
           </section>
 
           {/* ================= 9. ADDITIONAL NOTES ================= */}
-          <section className="mt-12">
-            <div className="mb-6 flex items-center gap-4">
+          <section className="mt-12 print:mt-6 print:break-inside-avoid">
+            <div className="mb-6 flex items-center gap-4 print:mb-2">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#EAF5F0] font-bold text-[#1E7A5A]">9</span>
               <h2 className="text-2xl font-bold text-[#1E7A5A]">ملاحظات إضافية</h2>
             </div>
-            <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
+            <div className="rounded-[22px] border border-[#E7F0EB] bg-white p-8 shadow-[0_10px_35px_rgba(30,122,90,0.08)] print:border-gray-200 print:shadow-none print:p-4">
               <textarea
                 value={formData.additionalNotes}
                 onChange={(e) => handleFlatChange("additionalNotes", e.target.value)}
                 placeholder="أي ملاحظات إضافية..."
-                className="min-h-[170px] w-full resize-y rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759]"
+                className="min-h-[170px] w-full resize-y rounded-xl border border-[#E7F0EB] bg-[#FAFDFC] px-5 py-4 outline-none focus:border-[#34C759] print:bg-white print:border-gray-300 print:min-h-[80px]"
               />
             </div>
           </section>
 
           {/* ================= ACTIONS ================= */}
+          {/* Hidden on print using print:hidden */}
           <div className="mt-12 flex flex-col justify-center gap-5 sm:flex-row print:hidden">
             <button
               type="submit"

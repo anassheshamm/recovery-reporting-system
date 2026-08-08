@@ -4,7 +4,6 @@ import { ArrowRight, Loader2, Printer, CheckCircle, XCircle } from "lucide-react
 import api from "../../services/api";
 import reportService from "../../services/report.service";
 import { useAuth } from "../../context/AuthContext";
-import BackButton from "../components/BackButton";
 
 const ReportPreviewPage = () => {
   const { reportId } = useParams();
@@ -90,12 +89,11 @@ const ReportPreviewPage = () => {
   const teamLeaderFullName = report.teamLeader ? `${report.teamLeader.firstName || ""} ${report.teamLeader.lastName || ""}` : "غير متوفر";
 
   return (
-    <div dir="rtl" className="min-h-screen font-['Cairo',sans-serif] text-[15px] leading-[1.9] text-[#27343A]">
-      <div>
-      <BackButton />
-      
-    </div>
-      <div className="mx-auto my-10 w-full max-w-[1100px] px-5 md:px-10">
+    <div dir="rtl"
+    className="min-h-screen font-['Cairo',sans-serif] text-[15px] leading-[1.9] text-[#27343A] print:bg-white print:bg-none">
+     
+    
+      <div className="mx-auto my-10 w-full max-w-[1100px] px-5 md:px-10 print:my-0 print:px-0 print:max-w-none">
         
         {/* Header Actions */}
         <div className="mb-8 flex items-center justify-between print:hidden">
@@ -110,12 +108,12 @@ const ReportPreviewPage = () => {
         </div>
 
         {/* ================= LETTERHEAD ================= */}
-        <header className="mb-8 rounded-[28px] border border-[#E7F0EB] bg-white/95 p-[28px] shadow-[0_10px_35px_rgba(30,122,90,0.08)]">
-          <div className="mb-8 flex flex-wrap items-center justify-center gap-12">
+        <header className=" rounded-[28px] border border-[#E7F0EB] bg-white/95 p-[28px] shadow-[0_10px_35px_rgba(30,122,90,0.08)] print:border-none print:shadow-none print:p-0">
+          <div className="mb-8 flex flex-wrap items-center justify-center gap-12 print:mb-4">
             <img src="/logo.png" alt="Logo" className="h-16 object-contain" />
             <img src="/logo2.png" alt="Logo" className="h-16 object-contain" />
           </div>
-          <div className="my-6 h-[2px] w-full bg-gradient-to-r from-transparent via-[#34C759] to-transparent" />
+          <div className="my-6 h-[2px] w-full bg-gradient-to-r from-transparent via-[#34C759] to-transparent print:bg-[#34C759]" />
           <div className="flex flex-col justify-between gap-6 md:flex-row">
             <div>
               <h1 className="text-3xl font-bold text-[#1E7A5A]">التقرير القبلي للمستفيد</h1>
