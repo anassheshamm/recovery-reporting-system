@@ -110,8 +110,9 @@ export const updatePatientValidation = [
     .optional(),
 
   body("email")
-    .optional()
-    .isEmail(),
+  .optional({ checkFalsy: true })
+  .isEmail()
+  .withMessage("Invalid email"),
 
   body("emergencyContactPhone")
     .optional(),
