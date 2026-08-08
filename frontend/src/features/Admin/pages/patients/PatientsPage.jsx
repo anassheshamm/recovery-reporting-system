@@ -2,37 +2,45 @@ import { useEffect, useState } from "react";
 import api from "../../../../services/api";
 import PatientsHeader from "../../../components/PageHeader";
 import PatientsTable from "./PatientsTable";
+import { useSearch } from "../../../../context/SearchContext"; // 1. Import Search Context
 
 const PatientsPage = () => {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1";
+  // 2. Get global search term
+  const { searchTerm } = useSearch();
 
+  // 3. Re-fetch whenever searchTerm changes (with debounce)
   useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("token"); // Retrieve stored JWT auth token
-    console.log("API_BASE_URL:", API_BASE_URL);
-    console.log("TOKEN:", token);
-       const response = await api.get("/patients");
+    const delayDebounceFn = setTimeout(() => {
+      fetchPatients();
+    }, 500);
 
-        if (response.data.success) {
-          setPatients(response.data.data || []);
-        }
-      } catch (err) {
-        setError(
-          err.response?.data?.message || "حدث خطأ أثناء تحميل بيانات المستفيدين"
-        );
-      } finally {
-        setLoading(false);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
+
+  const fetchPatients = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      // 4. Pass the search query parameter to the backend API route
+      const queryString = searchTerm ? `?search=${searchTerm}` : "";
+      const response = await api.get(`/patients${queryString}`);
+
+      if (response.data.success) {
+        setPatients(response.data.data || []);
       }
-    };
-
-    fetchPatients();
-  }, [API_BASE_URL]);
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "حدث خطأ أثناء تحميل بيانات المستفيدين"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Handler for exporting list as a basic CSV
   const handleDownload = () => {

@@ -211,13 +211,7 @@ const basePath = location.pathname.startsWith("/admin")
               تعديل المعلومات
             </button>
 
-            <button
-              onClick={handleDeletePatient}
-              className="flex items-center gap-2 rounded-xl border border-[#35C759] px-7 py-4 font-semibold text-[#247C5A] transition hover:bg-[#EDF8F2]"
-            >
-              <Trash2 size={18} />
-              حذف المستفيد
-            </button>
+            
 
           </div>
 

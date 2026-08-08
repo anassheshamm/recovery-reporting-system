@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { Plus, Search, FileText, LogOut } from "lucide-react";
+import { Plus, Search, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
+import { useSearch } from "../../context/SearchContext"; // 1. Import Search Context
 import { useNavigate } from "react-router-dom";
 
 import patientService from "../../services/patient.service";
 
-const DoctorSidebar = ({ onSearchChange }) => {
-  const [search, setSearch] = useState("");
+const DoctorSidebar = () => {
+  // 2. Pull global search state and updater
+  const { searchTerm, setSearchTerm } = useSearch();
 
   const [statistics, setStatistics] = useState({
     patients: 0,
@@ -17,38 +19,29 @@ const DoctorSidebar = ({ onSearchChange }) => {
   });
 
   const { logout } = useAuth();
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadStatistics();
   }, []);
 
-  const handleSearchChange = (e) => {
-    const val = e.target.value;
-    setSearch(val);
-    if (onSearchChange) {
-      onSearchChange(val);
-    }
+  const handleLogout = () => {
+    logout();
+    navigate("/", { replace: true });
   };
 
-  const handleLogout = () => {
-  logout();
-  navigate("/", { replace: true });
-};
+  const loadStatistics = async () => {
+    try {
+      const patientsResponse = await patientService.getAllPatients();
+      const patients = patientsResponse.data || [];
 
-const loadStatistics = async () => {
-  try {
-    const patientsResponse = await patientService.getAllPatients();
-
-    const patients = patientsResponse.data || [];
-
-    setStatistics({
-      patients: patients.length,
-    });
-  } catch (err) {
-    console.error("Failed to load statistics:", err);
-  }
-};
+      setStatistics({
+        patients: patients.length,
+      });
+    } catch (err) {
+      console.error("Failed to load statistics:", err);
+    }
+  };
 
   return (
     <aside
@@ -87,15 +80,12 @@ const loadStatistics = async () => {
           />
           <input
             type="text"
-            value={search}
-            onChange={handleSearchChange}
+            value={searchTerm} // 3. Bound directly to global context search term
+            onChange={(e) => setSearchTerm(e.target.value)} // 4. Updates global context instantly on keystroke
             placeholder="ابحث بالاسم أو رقم الهوية"
             className="h-14 w-full rounded-2xl bg-[#EDF8F2] pl-4 pr-14 text-right outline-none placeholder:text-gray-500 focus:ring-2 focus:ring-[#247C5A]/10"
           />
         </div>
-
-        {/* Fill Report */}
-       
 
         {/* Statistics */}
         <div className="space-y-6">
@@ -105,21 +95,16 @@ const loadStatistics = async () => {
               {statistics.patients}
             </span>
           </div>
-
-          
-
-             
         </div>
 
         <div className="flex-1" />
- <button
-  onClick={handleLogout}
-  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-red-200 text-red-600 transition hover:bg-red-50"
->
-  <LogOut size={18} />
-  تسجيل الخروج
-</button>
-   
+        <button
+          onClick={handleLogout}
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-red-200 text-red-600 transition hover:bg-red-50"
+        >
+          <LogOut size={18} />
+          تسجيل الخروج
+        </button>
       </div>
     </aside>
   );

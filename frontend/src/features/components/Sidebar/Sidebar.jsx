@@ -1,22 +1,19 @@
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { Plus, Search, LogOut } from "lucide-react"; // <-- FIX: Added LogOut import
+import { useNavigate } from "react-router-dom";
+import { Plus, Search, LogOut } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
+import { useSearch } from "../../../context/SearchContext"; // 1. Import SearchContext
 import InviteMemberModal from "../InviteMemberModal";
+import SidebarItem from "./SidebarItem";
 
-const Sidebar = ({ menu = [], onSearchChange }) => {
+const Sidebar = ({ menu = [] }) => {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [search, setSearch] = useState("");
+  
+  // 2. Use global search state instead of local state!
+  const { searchTerm, setSearchTerm } = useSearch(); 
+  
   const { logout } = useAuth();
   const navigate = useNavigate();
-
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearch(value);
-    if (onSearchChange) {
-      onSearchChange(value);
-    }
-  };
 
   const handleLogout = () => {
     logout();
@@ -24,7 +21,6 @@ const Sidebar = ({ menu = [], onSearchChange }) => {
   };
 
   const handleMemberAdded = () => {
-    // Triggers refresh or parent callback if supplied
     setIsInviteModalOpen(false);
   };
 
@@ -68,9 +64,9 @@ const Sidebar = ({ menu = [], onSearchChange }) => {
             />
             <input
               type="text"
-              value={search}
-              onChange={handleSearchChange}
-              placeholder="ابحث بالاسم أو رقم الهوية"
+              value={searchTerm} // 3. Bind to Context
+              onChange={(e) => setSearchTerm(e.target.value)} // 4. Update Context directly
+              placeholder="ابحث بالاسم أو رقم الهوية للمستفيد"
               className="h-14 w-full rounded-2xl bg-[#EDF8F2] pr-14 pl-4 text-right text-base outline-none transition placeholder:text-gray-500 focus:ring-2 focus:ring-[#247C5A]/10"
             />
           </div>
@@ -78,19 +74,7 @@ const Sidebar = ({ menu = [], onSearchChange }) => {
           {/* ================= Navigation ================= */}
           <nav className="space-y-4">
             {menu.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={({ isActive }) =>
-                  `flex h-14 items-center justify-center rounded-2xl text-lg font-semibold transition-all duration-200 ${
-                    isActive
-                      ? "bg-[#247C5A] text-white shadow-sm"
-                      : "bg-[#EDF8F2] text-[#2F2F2F] hover:bg-[#E6F4EC]"
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
+              <SidebarItem key={item.path || item.label} item={item} />
             ))}
           </nav>
 

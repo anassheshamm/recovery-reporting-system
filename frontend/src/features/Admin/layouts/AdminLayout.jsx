@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/Sidebar";
 
-
 const menu = [
   {
     label: "رئيس القسم",
@@ -15,7 +14,6 @@ const menu = [
     label: "المستفيدين",
     path: "/admin/patients",
   },
-  
 ];
 
 const AdminLayout = () => {
@@ -23,13 +21,14 @@ const AdminLayout = () => {
     <div dir="ltr" className="min-h-screen bg-[#FCFEFD]">
       <div className="flex">
         {/* Main Content */}
-        
         <main className="flex-1 px-10 py-8">
           <Outlet />
         </main>
 
-        {/* Sidebar */}
-        <Sidebar menu={menu} />
+        {/* Sidebar - Added print:hidden here */}
+        <div className="print:hidden">
+          <Sidebar menu={menu} />
+        </div>
       </div>
     </div>
   );
