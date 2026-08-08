@@ -19,4 +19,9 @@ router.post(
   invitationController.create
 );
 
+router.get(
+  "/verify/:token",
+  invitationController.verify
+);
+
 export default router;

@@ -76,6 +76,27 @@ class InvitationService {
 
     return invitation;
   }
+
+  async verify(token) {
+  const invitation = await Invitation.findOne({
+    token,
+    status: "pending",
+  });
+
+  if (!invitation) {
+    throw new AppError("Invalid invitation token.", 400);
+  }
+
+  if (invitation.expiresAt < new Date()) {
+    throw new AppError("Invitation has expired.", 400);
+  }
+
+  return {
+    email: invitation.email,
+    role: invitation.role,
+  };
+}
+
 }
 
 export default new InvitationService();
