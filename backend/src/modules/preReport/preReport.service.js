@@ -24,15 +24,16 @@ class PreReportService {
     }
 
     const existingReport = await PreReport.findOne({
-      patient: patient._id,
-    });
+  patient: patient._id,
+  "approval.status": { $ne: "rejected" },
+});
 
-    if (existingReport) {
-      throw new AppError(
-        "A pre-report already exists for this patient.",
-        409
-      );
-    }
+if (existingReport) {
+  throw new AppError(
+    "A pre-report already exists for this patient.",
+    409
+  );
+}
 
     const report = await PreReport.create({
       patient: patient._id,
