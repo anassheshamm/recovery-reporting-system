@@ -98,6 +98,23 @@ async getDashboardStats(req, res, next) {
     next(error);
   }
 }
+async updateStatus(req, res, next) {
+  try {
+    const patient = await patientService.updateStatus(
+      req.params.id,
+      req.body.status,
+      req.user
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Patient status updated successfully.",
+      data: patient,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 
 }
 

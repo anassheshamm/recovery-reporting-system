@@ -93,6 +93,18 @@ const patientSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
+    status: {
+      type: String,
+      enum: [
+    "active",
+    "completed",
+    "delayed",
+    "discontinued",
+  ],
+  default: "active",
+},
+
   },
   {
     timestamps: true,

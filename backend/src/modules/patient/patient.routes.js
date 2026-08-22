@@ -8,6 +8,7 @@ import validate from "../../middlewares/validate.middleware.js";
 import {
   createPatientValidation,
   updatePatientValidation,
+  updatePatientStatusValidation
 } from "./patient.validation.js";
 
 const router = Router();
@@ -33,6 +34,15 @@ router.get(
   protect,
   authorize("doctor"),
   patientController.getDashboardStats
+);
+
+router.patch(
+  "/:id/status",
+  protect,
+  authorize("doctor"),
+  updatePatientStatusValidation,
+  validate,
+  patientController.updateStatus
 );
 
 router.patch(

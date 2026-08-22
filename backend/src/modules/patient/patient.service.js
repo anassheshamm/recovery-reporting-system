@@ -204,6 +204,26 @@ class PatientService {
       pendingReports: pendingPreReports + pendingPostReports, // Fixed summation
     };
   }
+  
+  async updateStatus(patientId, status, user) {
+  const patient = await Patient.findOne({
+    _id: patientId,
+    doctor: user._id,
+  });
+
+  if (!patient) {
+    throw new AppError("Patient not found.", 404);
+  }
+
+  patient.status = status;
+
+  await patient.save();
+
+  return patient.populate(
+    "doctor",
+    "firstName middleName lastName email role"
+  );
+}
 }
 
 export default new PatientService();
