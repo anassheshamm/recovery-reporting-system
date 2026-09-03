@@ -33,15 +33,16 @@ const DoctorsadminPage = () => {
 
     fetchDoctors();
   }, []);
-    const handleDownload = () => {
-    if (!patients.length) return;
+
+  const handleDownload = () => {
+    if (!doctors.length) return;
     
     const headers = ["الاسم", "رقم الهوية", "الهاتف", "البريد الإلكتروني"];
-    const rows = patients.map((p) => [
-      `${p.firstName || ""} ${p.lastName || ""}`.trim(),
-      p.nationalId || "",
-      p.phone || "",
-      p.email || "",
+    const rows = doctors.map((doctor) => [
+      `${doctor.firstName || ""} ${doctor.lastName || ""}`.trim(),
+      doctor.nationalId || "",
+      doctor.phone || "",
+      doctor.email || "",
     ]);
 
     const csvContent =
@@ -51,7 +52,7 @@ const DoctorsadminPage = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "patients_list.csv");
+    link.setAttribute("download", "doctors_list.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

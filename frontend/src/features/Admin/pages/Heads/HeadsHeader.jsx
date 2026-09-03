@@ -1,6 +1,10 @@
+import React, { useState } from "react";
 import { Download } from "lucide-react";
+import ExportModal from "../../../components/ExportModal"; // Make sure to adjust this path based on where you saved ExportModal.jsx
 
-const HeadsHeader = ({ onDownload }) => {
+const HeadsHeader = () => {
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
   return (
     <>
       <div className="mb-3 text-sm text-gray-400">
@@ -18,18 +22,25 @@ const HeadsHeader = ({ onDownload }) => {
           </p>
         </div>
 
+        {/* Download Button triggers the Export Modal */}
         <button
-          onClick={onDownload}
+          onClick={() => setIsExportModalOpen(true)}
           type="button"
           className="flex items-center gap-2 rounded-xl bg-[#247C5A] px-6 py-3 text-white transition hover:bg-[#1F6D4E]"
         >
           <Download size={18} />
-          تنزيل اللائحة
+          تنزيل اللائحة (Excel)
         </button>
         
       </div>
 
       <div className="mt-8 h-px bg-[#E5EFE9]" />
+
+      {/* The Date Picker Export Modal */}
+      <ExportModal 
+        isOpen={isExportModalOpen} 
+        onClose={() => setIsExportModalOpen(false)} 
+      />
     </>
   );
 };

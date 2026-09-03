@@ -26,7 +26,7 @@ import TeamPatientsPage from "../features/TeamLeader/TeamPatientsPage";
 
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
-
+import DashboardPage from "../features/Admin/pages/Dashboard/DashboardPage";
 import Footer from "../components/Footer";
 
 export default function AppRouter() {
@@ -47,42 +47,48 @@ export default function AppRouter() {
           <Route path="/reset-password/:token" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
 
           {/* ================= Admin ================= */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute roles={["admin"]}>
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            {/* Redirects /admin to /admin/doctors by default */}
-            <Route index element={<Navigate to="doctors" replace />} />
-            <Route path="doctors" element={<DoctorsadminPage />} />
-            <Route path="patients" element={<PatientsPage />} />
-            <Route path="heads" element={<HeadsPage />} />
-            <Route
+
+<Route
+  path="/admin"
+  element={
+    <ProtectedRoute roles={["admin"]}>
+      <AdminLayout />
+    </ProtectedRoute>
+  }
+>
+  {/* Redirect /admin -> /admin/doctors */}
+  <Route index element={<Navigate to="doctors" replace />} />
+
+  <Route path="doctors" element={<DoctorsadminPage />} />
+  <Route path="patients" element={<PatientsPage />} />
+  <Route path="heads" element={<HeadsPage />} />
+
+  <Route
     path="patient/:patientId"
     element={<PatientProfilePage />}
   />
-            <Route
-  path="/admin/pre-reports/:reportId"
-  element={
-    <ProtectedRoute roles={["admin"]}>
-      <ReportPreviewPage />
-    </ProtectedRoute>
-  }
-/>
+
+  <Route
+    path="pre-reports/:reportId"
+    element={<ReportPreviewPage />}
+  />
+
+  <Route
+    path="post-reports/:reportId"
+    element={<PostReport />}
+  />
+</Route>
+
+{/* ================= Admin Dashboard (NO SIDEBAR) ================= */}
 
 <Route
-  path="/admin/post-reports/:reportId"
+  path="/admin/analytics"
   element={
     <ProtectedRoute roles={["admin"]}>
-      <PostReport />
+      <DashboardPage />
     </ProtectedRoute>
   }
 />
-          </Route>
-
           {/* ================= Doctor ================= */}
           <Route
             path="/doctor"
