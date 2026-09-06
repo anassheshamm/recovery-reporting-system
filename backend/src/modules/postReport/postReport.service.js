@@ -110,6 +110,9 @@ class PostReportService {
         data.additionalNotes,
     });
 
+    patient.status = "completed";
+await patient.save();
+
     await report.populate([
       {
         path: "patient",

@@ -44,6 +44,9 @@ class PreReportService {
       initialRecommendations: data.initialRecommendations,
     });
 
+    patient.status = "active";
+    await patient.save();
+
     await report.populate([
       {
         path: "patient",
