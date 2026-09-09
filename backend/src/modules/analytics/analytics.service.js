@@ -20,132 +20,150 @@ class AnalyticsService {
       },
     };
 
-    const [
-      totalPatients,
-      activePatients,
-      completedPatients,
-      delayedPatients,
-      discontinuedPatients,
-    ] = await Promise.all([
-      Patient.countDocuments(patientFilter),
+const [
+  totalPatients,
+  newPatients,
+  activePatients,
+  completedPatients,
+  delayedPatients,
+  discontinuedPatients,
+] = await Promise.all([
+  Patient.countDocuments(patientFilter),
 
-      Patient.countDocuments({
-        ...patientFilter,
-        status: "active",
-      }),
+  Patient.countDocuments({
+    createdAt: {
+      $gte: startDate,
+      $lte: endDate,
+    },
+  }),
 
-      Patient.countDocuments({
-        ...patientFilter,
-        status: "completed",
-      }),
+  Patient.countDocuments({
+    ...patientFilter,
+    status: "active",
+  }),
 
-      Patient.countDocuments({
-        ...patientFilter,
-        status: "delayed",
-      }),
+  Patient.countDocuments({
+    ...patientFilter,
+    status: "completed",
+  }),
 
-      Patient.countDocuments({
-        ...patientFilter,
-        status: "discontinued",
-      }),
-    ]);
+  Patient.countDocuments({
+    ...patientFilter,
+    status: "delayed",
+  }),
 
-    // ==========================================
-    // RECOVERY DURATION
-    //
-    // PreReport
-    //     ↓
-    // PostReport
-    //
-    // The PostReport must be inside the
-    // selected date range.
-    // ==========================================
+  Patient.countDocuments({
+    ...patientFilter,
+    status: "discontinued",
+  }),
+]);
 
-    const preReports = await PreReport.find({
-      createdAt: {
-        $lte: endDate,
-      },
-    })
-      .select("patient createdAt")
-      .sort({ createdAt: 1 })
-      .lean();
+// ==========================================
+// RECOVERY DURATION
+//
+// Recovery journey:
+//
+// PreReport
+//     ↓
+// Treatment period
+//     ↓
+// PostReport
+//
+// Recovery duration =
+// PreReport.createdAt → PostReport.createdAt
+//
+// Every PostReport represents one completed
+// recovery case.
+// ==========================================
 
-    const postReports = await PostReport.find({
-      createdAt: {
-        $gte: startDate,
-        $lte: endDate,
-      },
-    })
-      .select("patient createdAt")
-      .sort({ createdAt: 1 })
-      .lean();
+const preReports = await PreReport.find({
+  createdAt: {
+    $lte: endDate,
+  },
+})
+  .select("patient createdAt")
+  .sort({ createdAt: 1 })
+  .lean();
 
-    // ==========================================
-    // GROUP PRE REPORTS BY PATIENT
-    // ==========================================
+const postReports = await PostReport.find({
+  createdAt: {
+    $lte: endDate,
+  },
+})
+  .select("patient createdAt")
+  .sort({ createdAt: 1 })
+  .lean();
 
-    const preReportsByPatient = new Map();
+// ==========================================
+// GROUP PRE REPORTS BY PATIENT
+// ==========================================
 
-    for (const report of preReports) {
-      const patientId = report.patient.toString();
+const preReportsByPatient = new Map();
 
-      if (!preReportsByPatient.has(patientId)) {
-        preReportsByPatient.set(patientId, []);
-      }
+for (const report of preReports) {
+  const patientId = report.patient.toString();
 
-      preReportsByPatient.get(patientId).push(report);
-    }
+  if (!preReportsByPatient.has(patientId)) {
+    preReportsByPatient.set(patientId, []);
+  }
 
-    // ==========================================
-    // CALCULATE RECOVERY DURATIONS
-    // ==========================================
+  preReportsByPatient.get(patientId).push(report);
+}
 
-    const recoveryDurations = [];
+// ==========================================
+// CALCULATE RECOVERY DURATIONS
+// ==========================================
 
-    for (const postReport of postReports) {
-      const patientId = postReport.patient.toString();
+const recoveryDurations = [];
 
-      const patientPreReports =
-        preReportsByPatient.get(patientId);
+for (const postReport of postReports) {
+  const patientId = postReport.patient.toString();
 
-      if (!patientPreReports?.length) {
-        continue;
-      }
+  const patientPreReports =
+    preReportsByPatient.get(patientId);
 
-      // Find the latest PreReport before this PostReport.
-      const matchingPreReport = [...patientPreReports]
-        .reverse()
-        .find(
-          (preReport) =>
-            preReport.createdAt < postReport.createdAt
-        );
+  if (!patientPreReports?.length) {
+    continue;
+  }
 
-      if (!matchingPreReport) {
-        continue;
-      }
+  // Find the latest PreReport before this PostReport.
+  const matchingPreReport = [...patientPreReports]
+    .reverse()
+    .find(
+      (preReport) =>
+        preReport.createdAt < postReport.createdAt
+    );
 
-      const durationMs =
-        postReport.createdAt.getTime() -
-        matchingPreReport.createdAt.getTime();
+  if (!matchingPreReport) {
+    continue;
+  }
 
-      const durationMonths =
-        durationMs /
-        (1000 * 60 * 60 * 24 * 30.4375);
+  const durationMs =
+    postReport.createdAt.getTime() -
+    matchingPreReport.createdAt.getTime();
 
-      recoveryDurations.push(durationMonths);
-    }
+  const durationMonths =
+    durationMs /
+    (1000 * 60 * 60 * 24 * 30.4375);
 
-    // ==========================================
-    // AVERAGE RECOVERY DURATION
-    // ==========================================
+  recoveryDurations.push(durationMonths);
+}
 
-    const averageRecoveryDuration =
-      recoveryDurations.length > 0
-        ? recoveryDurations.reduce(
-            (sum, duration) => sum + duration,
-            0
-          ) / recoveryDurations.length
-        : 0;
+// ==========================================
+// AVERAGE RECOVERY DURATION
+//
+// Uses the exact same completed recovery
+// cases used by the distribution.
+// ==========================================
+
+const averageRecoveryDuration =
+  recoveryDurations.length > 0
+    ? recoveryDurations.reduce(
+        (sum, duration) => sum + duration,
+        0
+      ) / recoveryDurations.length
+    : 0;
+
 
     // ==========================================
     // MONTHLY REPORTS
@@ -179,6 +197,8 @@ class AnalyticsService {
     return {
       totalPatients,
 
+      newPatients,
+
       activePatients,
 
       completedPatients,
@@ -199,12 +219,13 @@ class AnalyticsService {
     };
   }
 
-  // ==========================================
-  // MONTHLY REPORTS
-  // ==========================================
+// ==========================================
+// MONTHLY REPORTS + NEW PATIENTS
+// ==========================================
 
-  async getMonthlyReports(startDate, endDate) {
-    const [preReports, postReports] = await Promise.all([
+async getMonthlyReports(startDate, endDate) {
+  const [preReports, postReports, patients] =
+    await Promise.all([
       PreReport.find({
         createdAt: {
           $gte: startDate,
@@ -222,86 +243,138 @@ class AnalyticsService {
       })
         .select("createdAt")
         .lean(),
+
+      Patient.find({
+        createdAt: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      })
+        .select("createdAt")
+        .lean(),
     ]);
 
-    const monthlyReportsMap = new Map();
+  const monthlyReportsMap = new Map();
 
-    const currentDate = new Date(
-      startDate.getFullYear(),
-      startDate.getMonth(),
-      1
+  const currentDate = new Date(
+    startDate.getFullYear(),
+    startDate.getMonth(),
+    1
+  );
+
+  const lastDate = new Date(
+    endDate.getFullYear(),
+    endDate.getMonth(),
+    1
+  );
+
+  // ==========================================
+  // CREATE ALL MONTHS
+  // ==========================================
+
+  while (currentDate <= lastDate) {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    const key = `${year}-${String(
+      month + 1
+    ).padStart(2, "0")}`;
+
+    monthlyReportsMap.set(key, {
+      key,
+
+      month: new Intl.DateTimeFormat("ar-SA", {
+        month: "long",
+      }).format(currentDate),
+
+      year,
+
+      reportCount: 0,
+
+      newPatients: 0,
+    });
+
+    currentDate.setMonth(
+      currentDate.getMonth() + 1
     );
+  }
 
-    const lastDate = new Date(
-      endDate.getFullYear(),
-      endDate.getMonth(),
-      1
-    );
+  // ==========================================
+  // COUNT PREREPORTS
+  // ==========================================
 
-    while (currentDate <= lastDate) {
-      const year = currentDate.getFullYear();
-      const month = currentDate.getMonth();
+  for (const report of preReports) {
+    const date = new Date(report.createdAt);
 
-      const key = `${year}-${String(
-        month + 1
-      ).padStart(2, "0")}`;
+    const key = `${date.getFullYear()}-${String(
+      date.getMonth() + 1
+    ).padStart(2, "0")}`;
 
-      monthlyReportsMap.set(key, {
-        key,
+    const month = monthlyReportsMap.get(key);
 
-        month: new Intl.DateTimeFormat("ar-SA", {
-          month: "long",
-        }).format(currentDate),
-
-        year,
-
-        count: 0,
-      });
-
-      currentDate.setMonth(
-        currentDate.getMonth() + 1
-      );
+    if (month) {
+      month.reportCount += 1;
     }
+  }
 
-    // Count PreReports
-    for (const report of preReports) {
-      const date = new Date(report.createdAt);
+  // ==========================================
+  // COUNT POSTREPORTS
+  // ==========================================
 
-      const key = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
-      ).padStart(2, "0")}`;
+  for (const report of postReports) {
+    const date = new Date(report.createdAt);
 
-      const month = monthlyReportsMap.get(key);
+    const key = `${date.getFullYear()}-${String(
+      date.getMonth() + 1
+    ).padStart(2, "0")}`;
 
-      if (month) {
-        month.count += 1;
-      }
+    const month = monthlyReportsMap.get(key);
+
+    if (month) {
+      month.reportCount += 1;
     }
+  }
 
-    // Count PostReports
-    for (const report of postReports) {
-      const date = new Date(report.createdAt);
+  // ==========================================
+  // COUNT NEW PATIENTS
+  // ==========================================
 
-      const key = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
-      ).padStart(2, "0")}`;
+  for (const patient of patients) {
+    const date = new Date(patient.createdAt);
 
-      const month = monthlyReportsMap.get(key);
+    const key = `${date.getFullYear()}-${String(
+      date.getMonth() + 1
+    ).padStart(2, "0")}`;
 
-      if (month) {
-        month.count += 1;
-      }
+    const month = monthlyReportsMap.get(key);
+
+    if (month) {
+      month.newPatients += 1;
     }
+  }
 
-    return Array.from(
-      monthlyReportsMap.values()
-    ).map(({ key, month, year, count }) => ({
+  // ==========================================
+  // FINAL MONTHLY DATA
+  // ==========================================
+
+  return Array.from(
+    monthlyReportsMap.values()
+  ).map(
+    ({
       key,
       month,
       year,
-      count,
-    }));
-  }
+      reportCount,
+      newPatients,
+    }) => ({
+      key,
+      month,
+      year,
+      reportCount,
+      newPatients,
+    })
+  );
+}
 
   // ==========================================
   // PATIENTS BY DOCTOR
