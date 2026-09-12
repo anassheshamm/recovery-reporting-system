@@ -1,19 +1,6 @@
-import { useState, useEffect } from "react";
 import PatientRow from "./PatientRow";
 
-const PatientsTable = ({ patients: initialPatients = [] }) => {
-  const [patients, setPatients] = useState(initialPatients);
-
-  useEffect(() => {
-    setPatients(initialPatients);
-  }, [initialPatients]);
-
-  const handleDeleteSuccess = (deletedId) => {
-    setPatients((prevPatients) =>
-      prevPatients.filter((patient) => patient._id !== deletedId)
-    );
-  };
-
+const PatientsTable = ({ patients = [], onDeleteSuccess }) => {
   return (
     <div className="overflow-hidden rounded-[28px] bg-white shadow-sm">
       <table dir="rtl" className="w-full border-separate border-spacing-y-4">
@@ -22,9 +9,7 @@ const PatientsTable = ({ patients: initialPatients = [] }) => {
             <th className="rounded-r-2xl px-6 py-5 text-right font-semibold">
               الاسم
             </th>
-            <th className="px-6 py-5 text-right font-semibold">
-              السن
-            </th>
+           
             <th className="px-6 py-5 text-right font-semibold">
               رقم الهوية
             </th>
@@ -37,6 +22,9 @@ const PatientsTable = ({ patients: initialPatients = [] }) => {
             <th className="px-6 py-5 text-right font-semibold">
               البريد الإلكتروني
             </th>
+            <th className="px-6 py-5 text-right font-semibold">
+              الحالة
+            </th>
             <th className="rounded-l-2xl px-6 py-5 text-center font-semibold">
               الإجراءات
             </th>
@@ -46,7 +34,7 @@ const PatientsTable = ({ patients: initialPatients = [] }) => {
         <tbody>
           {patients.length === 0 ? (
             <tr>
-              <td colSpan={7} className="py-20 text-center text-gray-400">
+              <td colSpan={8} className="py-20 text-center text-gray-400">
                 لا يوجد مستفيدون
               </td>
             </tr>
@@ -55,7 +43,7 @@ const PatientsTable = ({ patients: initialPatients = [] }) => {
               <PatientRow
                 key={patient._id}
                 patient={patient}
-                onDeleteSuccess={handleDeleteSuccess}
+                onDeleteSuccess={onDeleteSuccess}
               />
             ))
           )}

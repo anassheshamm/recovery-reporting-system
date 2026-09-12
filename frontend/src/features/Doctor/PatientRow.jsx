@@ -32,6 +32,23 @@ const PatientRow = ({ patient, onDeleteSuccess }) => {
     }
   };
 
+  const renderStatus = (status) => {
+    const statusConfig = {
+      active: { text: "نشط", className: "bg-green-100 text-green-700" },
+      completed: { text: "مكتمل", className: "bg-blue-100 text-blue-700" },
+      delayed: { text: "مؤجل", className: "bg-yellow-100 text-yellow-700" },
+      discontinued: { text: "منقطع", className: "bg-red-100 text-red-700" },
+    };
+
+    const current = statusConfig[status] || statusConfig.active;
+
+    return (
+      <span className={`inline-block rounded-full px-3 py-1 text-sm font-semibold ${current.className}`}>
+        {current.text}
+      </span>
+    );
+  };
+
   return (
     <tr className="bg-white text-right shadow-sm transition hover:bg-[#F8FAF9]">
       {/* Full Name */}
@@ -39,10 +56,7 @@ const PatientRow = ({ patient, onDeleteSuccess }) => {
         {patient.fullName || "-"}
       </td>
 
-      {/* Age */}
-      <td className="px-6 py-5 text-gray-600">
-        {patient.age ?? "-"}
-      </td>
+     
 
       {/* National ID */}
       <td className="px-6 py-5 text-gray-600">
@@ -64,31 +78,22 @@ const PatientRow = ({ patient, onDeleteSuccess }) => {
         {patient.email || "-"}
       </td>
 
+      {/* Status (Read-Only Badge) */}
+      <td className="px-6 py-5 text-right">
+        {renderStatus(patient.status)}
+      </td>
+
       {/* Actions */}
       <td className="rounded-l-2xl px-6 py-5">
         <div className="flex items-center justify-center gap-2">
           {/* View Details Link */}
           <Link
-  to={`/doctor/patient/${patient._id}`}
-  className="flex items-center gap-1.5 rounded-xl px-3 py-2 font-medium text-[#35C759] transition hover:bg-[#EDF8F2] active:scale-95"
->
+            to={`/doctor/patient/${patient._id}`}
+            className="flex items-center gap-1.5 rounded-xl px-3 py-2 font-medium text-[#35C759] transition hover:bg-[#EDF8F2] active:scale-95"
+          >
             <Eye size={18} />
             <span>عرض</span>
           </Link>
-
-          {/* Delete Button connected to API */}
-          {/* <button
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="flex items-center gap-1.5 rounded-xl px-3 py-2 font-medium text-red-500 transition hover:bg-red-50 active:scale-95 disabled:opacity-50"
-            title="حذف المستفيد"
-          >
-            {isDeleting ? (
-              <Loader2 size={18} className="animate-spin text-red-500" />
-            ) : (
-              <Trash2 size={18} />
-            )}
-          </button> */}
         </div>
       </td>
     </tr>

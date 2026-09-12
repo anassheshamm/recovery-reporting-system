@@ -15,15 +15,17 @@ const PatientsTable = ({ patients = [] }) => {
             <th className="px-6 py-5 text-right font-semibold">
               رقم الهاتف
             </th>
-            {/* Removed the 'Program' column to match backend/PatientRow */}
             <th className="px-6 py-5 text-right font-semibold">
               البريد الإلكتروني
             </th>
             <th className="px-6 py-5 text-right font-semibold">
               المعالج المشرف
             </th>
+            <th className="px-6 py-5 text-right font-semibold">
+              الحالة
+            </th>
             <th className="rounded-l-2xl px-6 py-5 text-center font-semibold">
-            رؤية ملف المستفيد
+              رؤية ملف المستفيد
             </th>
           </tr>
         </thead>
@@ -32,7 +34,7 @@ const PatientsTable = ({ patients = [] }) => {
           {patients.length === 0 ? (
             <tr>
               <td
-                colSpan={6} // Changed colSpan from 7 to 6 due to removed column
+                colSpan={7} // Updated from 6 to 7 to account for the new Status column
                 className="py-16 text-center text-gray-400"
               >
                 لا يوجد مستفيدون
