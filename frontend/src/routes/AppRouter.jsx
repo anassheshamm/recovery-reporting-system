@@ -29,6 +29,8 @@ import PublicRoute from "./PublicRoute";
 import DashboardPage from "../features/Admin/pages/Dashboard/DashboardPage";
 import Footer from "../components/Footer";
 
+import ProfilePage from "../pages/profilePage";
+
 export default function AppRouter() {
   return (
     // Wrap the entire app in a min-h-screen flex column layout
@@ -62,6 +64,7 @@ export default function AppRouter() {
   <Route path="doctors" element={<DoctorsadminPage />} />
   <Route path="patients" element={<PatientsPage />} />
   <Route path="heads" element={<HeadsPage />} />
+  <Route path="profile" element={<ProfilePage />} />
 
   <Route
     path="patient/:patientId"
@@ -100,6 +103,7 @@ export default function AppRouter() {
           >
             <Route index element={<DoctorsPage />} />
             <Route path="new" element={<CreatePatientPage />} />
+             <Route path="profile" element={<ProfilePage />} />
             <Route path="edit-patient/:patientId" element={<CreatePatientPage />} />
             <Route path="patient/:patientId" element={<PatientProfilePage />} />
             <Route path="reports/beneficiary/:patientId" element={<BeneficiaryReportPage />} />
@@ -134,6 +138,7 @@ export default function AppRouter() {
             }
           >
             <Route index element={<PendingReportsPage />} />
+            <Route path="profile" element={<ProfilePage />} />
             <Route path="doctors" element={<TeamDoctorsPage />} />
             <Route path="patients" element={<TeamPatientsPage />} />
             <Route path="patient/:patientId" element={<PatientProfilePage />} />

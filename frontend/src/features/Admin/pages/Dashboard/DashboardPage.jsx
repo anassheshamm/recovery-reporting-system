@@ -124,62 +124,83 @@ const DashboardPage = () => {
       </div>
 
       {/* Stats Cards Row */}
-      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-6">
-        <StatCard 
-          title="اجمالي المستفيدين" 
-          value={data?.totalPatients} 
-          trend="+12%" 
-          type="blue" 
-        />
-        <StatCard 
-          title="المستفيدين النشيطين" 
-          value={data?.activePatients} 
-          trend="+8%" 
-          type="blue" 
-        />
-        <StatCard 
-          title="المستفيدين المتخرجين من البرنامج" 
-          value={data?.completedPatients} 
-          trend="+15%" 
-          type="green" 
-        />
-        <StatCard 
-          title="الحالات المتعثره" 
-          value={data?.delayedPatients} 
-          trend="+3%" 
-          type="orange" 
-          subtext="Relapsed or >6mo duration" 
-        />
-        <StatCard 
-          title="تركو البرنامج" 
-          value={data?.discontinuedPatients} 
-          trend="-5%" 
-          type="red" 
-        />
-        <StatCard 
-          title="متوسط مده التشافي" 
-          value={data?.averageRecoveryDuration !== undefined ? `${data?.averageRecoveryDuration} mo` : null} 
-          trend="-0.3 mo" 
-          type="gray" 
-        />
-      </div>
+<div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-7">
+  <StatCard
+    title="اجمالي المستفيدين"
+    value={data?.totalPatients}
+    type="blue"
+  />
 
+  <StatCard
+    title="المستفيدين الجدد"
+    value={data?.newPatients}
+    type="blue"
+  />
+
+  <StatCard
+    title="المستفيدين النشيطين"
+    value={data?.activePatients}
+    type="blue"
+  />
+
+  <StatCard
+    title="المستفيدين المتخرجين من البرنامج"
+    value={data?.completedPatients}
+    type="green"
+  />
+
+  <StatCard
+    title="الحالات المتعثره"
+    value={data?.delayedPatients}
+    type="orange"
+  />
+
+  <StatCard
+    title="تركو البرنامج"
+    value={data?.discontinuedPatients}
+    type="red"
+  />
+
+  <StatCard
+    title="متوسط مده التشافي"
+    value={
+      data?.averageRecoveryDuration !== undefined
+        ? `${data.averageRecoveryDuration} أشهر`
+        : null
+    }
+    type="gray"
+  />
+</div>
       {/* Middle Row Charts */}
       <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-12">
         
         {/* Left Column - Monthly Reports */}
         <div className="flex flex-col rounded-[20px] border border-gray-100 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] lg:col-span-8 lg:p-8">
           <div className="mb-8 text-right">
-            <h3 className="text-[20px] font-bold text-[#111827]">التقارير الشهريه</h3>
-            <p className="mt-1 text-[13px] text-[#8B98A5]">لتقارير التشخيصية الشهرية للحالات النشطة (من يناير إلى ديسمبر)</p>
+            <h3 className="text-[20px] font-bold text-[#111827]">
+  التقارير والمستفيدون الجدد شهريًا
+</h3>
+
+<p className="mt-1 text-[13px] text-[#8B98A5]">
+  عدد التقارير المنشأة والمستفيدين الجدد خلال الفترة المحددة
+</p>
           </div>
           <div className="h-[320px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data?.monthlyReports} margin={{ top: 10, right: 0, left: -25, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#F3F4F6" />
                 <XAxis 
-                  dataKey="month" 
+                  dataKey="key"
                   reversed={true}
+                  tickFormatter={(key) => {
+                    const reportMonth = data?.monthlyReports?.find(
+                      (report) => report.key === key
+                    );
+
+                    return reportMonth
+                      ? `${reportMonth.month} ${reportMonth.year}`
+                      : key;
+                  }}
                   tick={{ fill: '#8B98A5', fontSize: 13, fontFamily: 'Cairo' }} 
                   axisLine={false} 
                   tickLine={false} 
@@ -192,16 +213,48 @@ const DashboardPage = () => {
                   tickLine={false} 
                   dx={15}
                 />
-                <Tooltip 
-                  cursor={{ fill: '#F9FAFB' }} 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', fontFamily: 'Cairo' }}
-                />
-                <Bar 
-                  dataKey="count" 
-                  fill="#35C759" 
-                  radius={[4, 4, 0, 0]} 
-                  barSize={32} 
-                />
+                <Tooltip
+  cursor={{ fill: '#F9FAFB' }}
+  labelFormatter={(key) => {
+    const reportMonth = data?.monthlyReports?.find(
+      (report) => report.key === key
+    );
+
+    return reportMonth
+      ? `${reportMonth.month} ${reportMonth.year}`
+      : key;
+  }}
+  formatter={(value, name) => {
+    return [
+      value,
+      name === "reportCount"
+        ? "عدد التقارير"
+        : "المستفيدون الجدد",
+    ];
+  }}
+  contentStyle={{
+    borderRadius: '12px',
+    border: 'none',
+    boxShadow:
+      '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    fontFamily: 'Cairo',
+  }}
+/>
+                <Bar
+  dataKey="reportCount"
+  name="reportCount"
+  fill="#35C759"
+  radius={[4, 4, 0, 0]}
+  barSize={24}
+/>
+
+<Bar
+  dataKey="newPatients"
+  name="newPatients"
+  fill="#31778b"
+  radius={[4, 4, 0, 0]}
+  barSize={24}
+/>
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -211,7 +264,7 @@ const DashboardPage = () => {
         <div className="flex flex-col rounded-[20px] border border-gray-100 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] lg:col-span-4 lg:p-8">
           <div className="mb-8 text-right">
             <h3 className="text-[20px] font-bold text-[#111827]">عدد المرضى لكل معالج</h3>
-            <p className="mt-1 text-[13px] text-[#8B98A5]">حجم الحالات السريرية النشطة مرتباً تنازلياً</p>
+            <p className="mt-1 text-[13px] text-[#8B98A5]">عدد المستفيدين المسجلين لكل معالج حتى نهاية الفترة</p>
           </div>
           <div className="flex flex-col gap-5">
             {data?.patientsByDoctor?.map((doc, idx) => {
@@ -249,7 +302,7 @@ const DashboardPage = () => {
       <div className="flex flex-col rounded-[20px] border border-gray-100 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] lg:p-8">
         <div className="mb-8 text-right">
           <h3 className="text-[20px] font-bold text-[#111827]">توزيع مدة التعافي</h3>
-          <p className="mt-1 text-[13px] text-[#8B98A5]">عدد المرضى مصنفاً حسب مدة التعافي النشط (بالأشهر)</p>
+          <p className="mt-1 text-[13px] text-[#8B98A5]">عدد حالات التعافي مصنفاً حسب مدة التعافي بالأشهر</p>
         </div>
         <div className="h-[320px] w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -258,7 +311,7 @@ const DashboardPage = () => {
               <XAxis 
                 dataKey="month" 
                 reversed={true}
-                tickFormatter={(val) => val === 12 ? '12+mo' : `${val}mo`} 
+                tickFormatter={(val) => val === 12 ? '12+ شهر' : `${val} شهر`} 
                 tick={{ fill: '#8B98A5', fontSize: 13, fontFamily: 'Cairo' }} 
                 axisLine={false} 
                 tickLine={false} 
@@ -274,7 +327,7 @@ const DashboardPage = () => {
               <Tooltip 
                 cursor={{ fill: '#F9FAFB' }} 
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', fontFamily: 'Cairo' }}
-                labelFormatter={(label) => label === 12 ? '12+ شهور' : `${label} شهور`}
+                labelFormatter={(label) => label === 12 ? '12+ شهر' : label === 1 ? 'شهر واحد' : label === 2 ? 'شهران' : `${label} أشهر`}
                 formatter={(value) => [value, 'العدد']}
               />
               <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={45}>
@@ -295,36 +348,18 @@ const DashboardPage = () => {
 };
 
 // Reusable Stat Card Component
-const StatCard = ({ title, value, trend, type = "blue", subtext }) => {
-  const theme = {
-    blue: { bg: "bg-[#EBF2FE]", text: "text-[#1B64F2]", icon: "↗" },
-    green: { bg: "bg-[#E3F9E5]", text: "text-[#35C759]", icon: "↗" },
-    orange: { bg: "bg-[#FEF0D4]", text: "text-[#F5A623]", icon: "↗" },
-    red: { bg: "bg-[#FCE8E8]", text: "text-[#E02424]", icon: "↘" },
-    gray: { bg: "bg-[#F3F4F6]", text: "text-[#4B5563]", icon: "↘" },
-  };
-
-  const activeTheme = theme[type];
-
+const StatCard = ({ title, value }) => {
   return (
     <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-100 bg-white p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-      <h4 className="mb-4 text-center text-[14px] font-semibold text-[#8B98A5]">{title}</h4>
-      
-      <span className="mb-3 text-[38px] font-extrabold tracking-tight text-[#111827]">
-        {value !== undefined && value !== null ? value.toLocaleString() : "0"}
+      <h4 className="mb-4 text-center text-[14px] font-semibold text-[#8B98A5]">
+        {title}
+      </h4>
+
+      <span className="text-[38px] font-extrabold tracking-tight text-[#111827]">
+        {value !== undefined && value !== null
+          ? value.toLocaleString()
+          : "0"}
       </span>
-      
-      {subtext && (
-        <span className="mb-3 text-[11px] text-[#8B98A5]">{subtext}</span>
-      )}
-      
-      <div className="flex items-center justify-center gap-2">
-        <span className={`flex items-center gap-1 rounded-[4px] px-2 py-0.5 text-[12px] font-bold ${activeTheme.bg} ${activeTheme.text}`}>
-          <span className="text-[14px] font-black leading-none">{activeTheme.icon}</span> 
-          <span dir="ltr">{trend}</span>
-        </span>
-        <span className="text-[12px] font-medium text-[#A0ABB8]">vs prior period</span>
-      </div>
     </div>
   );
 };

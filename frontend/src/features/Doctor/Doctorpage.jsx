@@ -9,30 +9,42 @@ const DoctorsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // 1. Get the search term from context
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const { searchTerm } = useSearch();
 
-  // DEBUG LOG 1: Check if the context is updating when you type
-  console.log("Current Search Term on Page:", searchTerm);
+  // Reset to first page when searching
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm]);
 
-  // 2. Trigger fetch when searchTerm changes (with a 500ms delay)
+  // Load patients when search or page changes
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       loadPatients();
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]);
+  }, [searchTerm, page]);
 
   const calculateAge = (birthDate) => {
     if (!birthDate) return "-";
+
     const today = new Date();
     const birth = new Date(birthDate);
+
     let age = today.getFullYear() - birth.getFullYear();
+
     const month = today.getMonth() - birth.getMonth();
-    if (month < 0 || (month === 0 && today.getDate() < birth.getDate())) {
+
+    if (
+      month < 0 ||
+      (month === 0 && today.getDate() < birth.getDate())
+    ) {
       age--;
     }
+
     return age;
   };
 
@@ -41,40 +53,60 @@ const DoctorsPage = () => {
       setLoading(true);
       setError("");
 
-      // DEBUG LOG 2: Check exactly what is being sent to the API
-      console.log("Sending to API:", searchTerm);
+      const response = await patientService.getAllPatients(
+        searchTerm,
+        page,
+        15
+      );
 
-      // 3. Fetch from backend using the search term
-      const response = await patientService.getAllPatients(searchTerm);
       const rawPatients = response.data || [];
 
-      // 4. MAP THE DATA! (This is what makes the table display correctly)
+      setTotalPages(
+        response.pagination?.totalPages || 1
+      );
+
       const mappedPatients = rawPatients.map((patient) => ({
         _id: patient._id,
-        fullName: [patient.firstName, patient.middleName, patient.lastName]
+
+        fullName: [
+          patient.firstName,
+          patient.middleName,
+          patient.lastName,
+        ]
           .filter(Boolean)
           .join(" "),
+
         age: calculateAge(patient.dateOfBirth),
+
         nationalId: patient.nationalId || "-",
+
         phone: patient.phone || "-",
+
         email: patient.email || "-",
+
+        status: patient.status || "active",
+
         joinDate: patient.createdAt
-          ? new Date(patient.createdAt).toLocaleDateString("en-GB")
+          ? new Date(patient.createdAt).toLocaleDateString(
+              "en-GB"
+            )
           : "-",
       }));
 
-      // 5. Save the properly formatted data to state
       setPatients(mappedPatients);
     } catch (err) {
-      console.error("ERROR:", err);
+      console.error(err);
+
       setError(
-        err.response?.data?.message || "حدث خطأ أثناء تحميل المستفيدين"
+        err.response?.data?.message ||
+          "حدث خطأ أثناء تحميل المستفيدين"
       );
     } finally {
       setLoading(false);
     }
   };
-   const handleDownload = () => {
+
+  const handleDownload = () => {
     if (!patients.length) return;
     
     const headers = ["الاسم", "رقم الهوية", "الهاتف", "البريد الإلكتروني"];
@@ -97,7 +129,7 @@ const DoctorsPage = () => {
     link.click();
     document.body.removeChild(link);
   };
-
+  
   return (
     <div className="mx-auto max-w-[1300px]">
       <PageHeader
@@ -105,7 +137,6 @@ const DoctorsPage = () => {
         description="عرض وإدارة جميع ملفات المستفيدين الخاصة بالمركز"
         downloadText="تنزيل لائحة المستفيدين"
         onDownload={handleDownload}
-
       />
 
       {loading ? (
@@ -117,7 +148,35 @@ const DoctorsPage = () => {
           {error}
         </div>
       ) : (
-        <PatientsTable patients={patients} />
+        <>
+          <PatientsTable patients={patients} />
+
+          <div className="mt-6 flex items-center justify-center gap-4">
+            <button
+              disabled={page === 1}
+              onClick={() =>
+                setPage((prev) => prev - 1)
+              }
+              className="rounded-lg border px-4 py-2 disabled:opacity-50"
+            >
+              السابق
+            </button>
+
+            <span>
+              الصفحة {page} من {totalPages}
+            </span>
+
+            <button
+              disabled={page >= totalPages}
+              onClick={() =>
+                setPage((prev) => prev + 1)
+              }
+              className="rounded-lg border px-4 py-2 disabled:opacity-50"
+            >
+              التالي
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

@@ -24,56 +24,92 @@ class PatientService {
     );
   }
 
-  async getAll(user, search) {
-    const query = {};
+  async getAll(user, search, page = 1, limit = 15) {
+  const query = {};
 
-    // Doctor can only see his patients
-    if (user.role === "doctor") {
-      query.doctor = user._id;
-    } 
-    // Team Leader sees patients of doctors assigned to them
-    else if (user.role === "teamLeader") {
-      const myDoctors = await User.find({ teamLeader: user._id }).select("_id");
-      const doctorIds = myDoctors.map((doc) => doc._id);
-      query.doctor = { $in: doctorIds };
-    }
+  // Doctor can only see his patients
+  if (user.role === "doctor") {
+    query.doctor = user._id;
+  }
 
-    // Search by name or national ID
-    if (search) {
-      query.$or = [
-        {
-          firstName: {
-            $regex: search,
-            $options: "i",
-          },
-        },
-        {
-          middleName: {
-            $regex: search,
-            $options: "i",
-          },
-        },
-        {
-          lastName: {
-            $regex: search,
-            $options: "i",
-          },
-        },
-        {
-          nationalId: {
-            $regex: search,
-            $options: "i",
-          },
-        },
-      ];
-    }
+  // Team Leader sees patients of doctors assigned to them
+  else if (user.role === "teamLeader") {
+    const myDoctors = await User.find({
+      teamLeader: user._id,
+    }).select("_id");
 
-    return await Patient.find(query)
-      .populate("doctor", "firstName middleName lastName")
+    const doctorIds = myDoctors.map((doc) => doc._id);
+
+    query.doctor = {
+      $in: doctorIds,
+    };
+  }
+
+  // Search by name or national ID
+  if (search) {
+    query.$or = [
+      {
+        firstName: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        middleName: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        lastName: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        nationalId: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+    ];
+  }
+
+  const currentPage = Number(page) || 1;
+  const pageSize = Number(limit) || 15;
+  const skip = (currentPage - 1) * pageSize;
+
+  const [patients, totalPatients] = await Promise.all([
+    Patient.find(query)
+      .populate(
+        "doctor",
+        "firstName middleName lastName"
+      )
       .sort({
         createdAt: -1,
-      });
-  }
+      })
+      .skip(skip)
+      .limit(pageSize),
+
+    Patient.countDocuments(query),
+  ]);
+
+  return {
+    patients,
+    pagination: {
+      totalPatients,
+      currentPage,
+      pageSize,
+      totalPages: Math.ceil(
+        totalPatients / pageSize
+      ),
+      hasNextPage:
+        currentPage <
+        Math.ceil(totalPatients / pageSize),
+      hasPreviousPage: currentPage > 1,
+    },
+  };
+}
 
   async getById(patientId, user) {
     let patient;

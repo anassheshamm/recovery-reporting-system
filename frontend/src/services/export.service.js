@@ -1,13 +1,16 @@
-import api from "./api";
+import { Router } from "express";
+import exportController from "./export.controller.js";
+import protect from "../../middlewares/protect.middleware.js";
+import authorize from "../../middlewares/authorize.middleware.js";
 
-const exportService = {
-  async exportExcel(from, to) {
-    const response = await api.get("/export/excel", {
-      params: { from, to },
-      responseType: "blob",
-    });
-    return response.data;
-  },
-};
+const router = Router();
 
-export default exportService;
+router.get(
+  "/excel",
+  protect,
+  // Pass additional roles to the authorize middleware
+  authorize("admin", "doctor", "teamLeader"), 
+  exportController.exportExcel
+);
+
+export default router;

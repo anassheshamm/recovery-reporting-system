@@ -21,14 +21,17 @@ class PatientController {
 
 async getAll(req, res, next) {
   try {
-    const patients = await patientService.getAll(
+    const result = await patientService.getAll(
       req.user,
-      req.query.search
+      req.query.search,
+      req.query.page || 1,
+      req.query.limit || 15
     );
 
     return res.status(200).json({
       success: true,
-      data: patients,
+      data: result.patients,
+      pagination: result.pagination,
     });
   } catch (error) {
     next(error);
