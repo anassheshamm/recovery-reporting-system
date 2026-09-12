@@ -25,7 +25,9 @@ app.use(compression());
 
 app.use(
   cors({
-    origin: "https://app.wathq.org",
+    // origin: "https://app.wathq.org",
+      origin: "https://irshad-reporting-system.vercel.app",
+
     credentials: true,
   })
 );
