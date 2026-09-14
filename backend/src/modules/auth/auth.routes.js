@@ -1,9 +1,15 @@
 import { Router } from "express";
 
 import authController from "./auth.controller.js";
-import { loginValidation } from "./auth.validation.js";
+
+import {
+  loginValidation,
+  registerValidation,
+  forgotPasswordValidation,
+  resetPasswordValidation,
+} from "./auth.validation.js";
+
 import validate from "../../middlewares/validate.middleware.js";
-import { registerValidation } from "./auth.validation.js";
 
 const router = Router();
 
@@ -19,6 +25,20 @@ router.post(
   registerValidation,
   validate,
   authController.register
+);
+
+router.post(
+  "/forgot-password",
+  forgotPasswordValidation,
+  validate,
+  authController.forgotPassword
+);
+
+router.post(
+  "/reset-password",
+  resetPasswordValidation,
+  validate,
+  authController.resetPassword
 );
 
 export default router;

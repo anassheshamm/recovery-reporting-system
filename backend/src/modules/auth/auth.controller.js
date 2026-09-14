@@ -30,6 +30,39 @@ class AuthController {
     next(error);
   }
 }
+
+async forgotPassword(req, res, next) {
+  try {
+    await authService.forgotPassword(
+      req.body.email
+    );
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "If the email exists, a password reset link has been sent.",
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async resetPassword(req, res, next) {
+  try {
+    await authService.resetPassword(
+      req.body.token,
+      req.body.password
+    );
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "Password has been reset successfully.",
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 }
 
 export default new AuthController();

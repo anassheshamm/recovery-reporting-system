@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
-
+import authService from "../../services/auth.service";
 import logo from "/logo.png";
 
 const ForgotPasswordPage = () => {
@@ -9,24 +9,23 @@ const ForgotPasswordPage = () => {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!email) return;
+  if (!email) return;
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      // TODO:
-      // await forgotPassword(email);
+    await authService.forgotPassword(email);
 
-      setSent(true);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setSent(true);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <main
