@@ -12,7 +12,7 @@ const Sidebar = ({ menu = [] }) => {
   // 2. Use global search state instead of local state!
   const { searchTerm, setSearchTerm } = useSearch(); 
   
-  const { logout } = useAuth();
+const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -47,14 +47,16 @@ const Sidebar = ({ menu = [] }) => {
           </div>
 
           {/* ================= Invite Member ================= */}
-          <button
-            type="button"
-            onClick={() => setIsInviteModalOpen(true)}
-            className="mb-8 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#35C759] text-lg font-semibold text-white transition-all duration-200 hover:bg-[#2FB350] active:scale-[0.98]"
-          >
-            <Plus size={22} />
-            <span>إضافة عضو جديد</span>
-          </button>
+{user?.canInviteUsers === true && (
+  <button
+    type="button"
+    onClick={() => setIsInviteModalOpen(true)}
+    className="mb-8 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#35C759] text-lg font-semibold text-white transition-all duration-200 hover:bg-[#2FB350] active:scale-[0.98]"
+  >
+    <Plus size={22} />
+    <span>إضافة عضو جديد</span>
+  </button>
+)}
 
           {/* ================= Search ================= */}
           <div className="relative mb-8">

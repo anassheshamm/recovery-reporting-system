@@ -18,10 +18,13 @@ async login(email, password) {
   console.log("Email:", email);
   console.log("User found:", !!user);
 
-  if (!user) {
-    console.log("❌ User not found");
-    throw new AppError("Invalid email or password.", 401);
-  }
+if (!user) {
+  console.log("❌ User not found");
+  throw new AppError(
+    "البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى التأكد من البيانات والمحاولة مرة أخرى.",
+    401
+  );
+}
 
   console.log("User ID:", user._id);
   console.log("User active:", user.isActive);
@@ -37,7 +40,10 @@ async login(email, password) {
 
   if (!isPasswordValid) {
     console.log("❌ Password mismatch");
-    throw new AppError("Invalid email or password.", 401);
+    throw new AppError(
+      "البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى التأكد من البيانات والمحاولة مرة أخرى.",
+      401
+    );
   }
 
   console.log("✅ LOGIN SUCCESS");
