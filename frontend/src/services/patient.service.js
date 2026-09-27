@@ -19,10 +19,15 @@ const patientService = {
   // ===========================
   // Get Patients (Used by Team Leader / Dashboard)
   // ===========================
-  getPatients(search = "") {
-    const queryString = search ? `?search=${search}` : "";
-    return api.get(`/patients${queryString}`);
-  },
+  getPatients(search = "", page = 1, limit = 15) {
+  return api.get("/patients", {
+    params: {
+      search,
+      page,
+      limit,
+    },
+  });
+},
 
   // ===========================
   // Get Dashboard Stats

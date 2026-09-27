@@ -37,7 +37,7 @@ const TeamLeaderSidebar = () => {
    
         setStats({
           doctors: teamRes.data?.data?.length || 0,
-          patients: patientsRes.data?.data?.length || 0,
+          patients: patientsRes.data?.pagination?.totalPatients || 0,
           pendingReports: pendingCount,
           allReports: pendingCount, 
         });
